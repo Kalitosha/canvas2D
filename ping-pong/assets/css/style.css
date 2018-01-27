@@ -1,0 +1,16 @@
+﻿@charset "UTF-8";
+
+body {
+    padding: 0px;
+    background-position: left top;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#myCanvas{
+    background-color: darkslategray;
+	margin:0.1px;
+	padding:0;
+}

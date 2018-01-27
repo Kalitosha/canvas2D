@@ -1,0 +1,15 @@
+﻿body {
+    padding: 0px;
+    background-position: left top;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#canvas{
+    background-color: rgb(24, 28, 77);
+    background-image: url('../images/background.png');
+	margin:0.1px;
+	padding:0;
+}
