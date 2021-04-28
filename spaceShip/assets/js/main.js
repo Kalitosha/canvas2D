@@ -11,23 +11,23 @@ let gameStatus = 'start'; // start, play, end
 let keys = [false, false, false];
 let isTouch = false;
 
-let explIm = new Image();
-explIm.src = 'assets\\images\\spriteMapExpl.png';
+/*let explIm = new Image();
+explIm.src = 'assets\\images\\spriteMapExpl.png';*/
 
 bgIm = new Image();
 bgIm.src = 'assets\\images\\background.png';
 
-let healthIm = new Image();
-healthIm.src = 'assets\\images\\life.png';
+/*let healthIm = new Image();
+healthIm.src = 'assets\\images\\life.png';*/
 
-let playerIm = new Image();
-playerIm.src = 'assets\\images\\ship1.png';
+/*let playerIm = new Image();
+playerIm.src = 'assets\\images\\ship1.png';*/
 
-let shipExpIm = new Image();
-shipExpIm.src = 'assets\\images\\explShip.png';
+/*let shipExpIm = new Image();
+shipExpIm.src = 'assets\\images\\explShip.png';*/
 
-let asteroidIm = new Image();
-asteroidIm.src = 'assets\\images\\asteroid.png';
+/*let asteroidIm = new Image();
+asteroidIm.src = 'assets\\images\\asteroid.png';*/
 
 /*let WIDTH = document.documentElement.clientWidth;
 let HEIGHT = document.documentElement.clientHeight;*/
@@ -48,14 +48,15 @@ window.onload = function () {
   bgAudio.volume = 0.1;
   //bgAudio.play();
 
-  explM1 = new Audio('assets\\audio\\explosion1.mp3'); // TODO где объявление??
-  explM2 = new Audio('assets\\audio\\explosion2.mp3');
+  /*explMusic = new Audio('assets\\audio\\explosion1.mp3');*/ 
+  explMusic_2 = new Audio('assets\\audio\\explosion2.mp3');
 
   reDraw();
 };
 
+
 var player = {
-  x: WIDTH / 2 - HEIGHT / 10 / 2, // координата х
+  /*x: WIDTH / 2 - HEIGHT / 10 / 2, // координата х
   y: HEIGHT - HEIGHT / 9 - 15, // координата у
   w: HEIGHT / 10, // ширина
   h: HEIGHT / 9, // высота
@@ -63,19 +64,19 @@ var player = {
   score: 0,
 
   health: 3,
-  healthW: 50,
+  healthW: 50,*/
 
-  drawSprite: function () {
+  /*drawSprite: function () {
     ctx.drawImage(playerIm, this.x, this.y, this.w, this.h);
   },
   drawExpSprite: function () {
-    explM1.pause();
-    explM1.currentTime = 0.0;
+    explMusic.pause();
+    explMusic.currentTime = 0.0;
     ctx.drawImage(shipExpIm, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
-    explM1.play();
-  },
+    explMusic.play();
+  },*/
 
-  drawScore: function () {
+  /*drawScore: function () {
     ctx.fillStyle = "#3b95d4";
     ctx.shadowColor = "#3b95d4";
     ctx.shadowBlur = 15;
@@ -83,22 +84,22 @@ var player = {
     ctx.textAlign = "right"; // выравнивание
     ctx.fillText(this.score, WIDTH - 50, 35);
     ctx.shadowBlur = 0;
-  },
+  },*/
 
-  drawHealth: function () {
+  /*drawHealth: function () {
     if (this.health >= 3)
       ctx.drawImage(healthIm, 10 + this.healthW + 10 + this.healthW + 10, 10, this.healthW, 40);
     if (this.health >= 2)
       ctx.drawImage(healthIm, 10 + this.healthW + 10, 10, this.healthW, 40);
     if (this.health >= 1)
       ctx.drawImage(healthIm, 10, 10, this.healthW, 40);
-  }
+  }*/
 };
-
+/*
 var lazerReloadDistance = player.y - 120;
-var lazerLoaded = true;
+var lazerLoaded = true;*/
 
-function Lazer() {
+/*function Lazer() {
   this.x = player.x + player.w / 2;
   this.y = player.y;
   this.lazerSpeed = 16;
@@ -110,8 +111,8 @@ function Lazer() {
     ctx.fillRect(this.x, this.y, 2, 18);
     ctx.shadowBlur = 0;
   }
-}
-
+}*/
+/*
 var lazers = [];
 
 function DrawLasers() {
@@ -131,36 +132,37 @@ function DrawLasers() {
       lazers.splice(i, 1); // начиная с i удалили один эл-т
     }
   }
-}
+}*/
 
 var maxAsteroids = 20;
+
 function Asteroid() {
-  this.alive = true;
+  /*this.alive = true;
   this.speed = 5;
   this.x = Math.floor(Math.random() * WIDTH - HEIGHT / 10);
   this.y = 0 - HEIGHT / 10;
   this.h = HEIGHT / 10;
   this.w = HEIGHT / 10;
 
-  this.explLife = 6;
-  this.drawSprite = function () {
+  this.explLife = 6;*/
+  /*this.drawSprite = function () {
     ctx.drawImage(asteroidIm, this.x, this.y, this.w, this.h);
     this.y += this.speed;
-  };
+  };*/
 
-  this.explX = 0;
-  this.explWidth = 194;
+  /*this.explX = 0;
+  this.explWidth = 194;*/
 
-  this.drawExplosion = function () {
+  /*this.drawExplosion = function () {
     ctx.drawImage(explIm, this.explX, 0, this.explWidth, explIm.height, this.x, this.y, this.w, this.h);
     this.explX += 194; // this.explHeight;
     this.explHeight += 194;
 
-  }
+  }*/
 }
 
-var asteroids = [];
-var explAsteroids = [];
+/*var asteroids = [];
+var explAsteroids = [];*/
 
 function DrawAsteroids() {
   if (
@@ -228,9 +230,9 @@ function CheckCollision() {
         (currentL.y <= currentA.y)) {
         currentA.alive = false;
 
-        explM2.pause();
-        explM2.currentTime = 0.0;
-        explM2.play();
+        explMusic_2.pause();
+        explMusic_2.currentTime = 0.0;
+        explMusic_2.play();
 
         player.score++;
         lazers.splice(lazers.indexOf(currentL), 1);
@@ -489,6 +491,7 @@ function resize(e) {
   HEIGHT = e.target.innerHeight;
 }
 
+/*
 document.addEventListener('dblclick', function (e) {
   e.preventDefault()
-});
+});*/

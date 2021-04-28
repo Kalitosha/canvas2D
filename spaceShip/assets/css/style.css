@@ -12,7 +12,7 @@
     background-image: url('../images/background.png');
 	margin:0.1px;
 	padding:0;
-    touch-action: manipulation;
+    touch-action: manipulation; /*отключение двойного клика - увеличения на сенсорных устройствах*/
     /* width: 100vw;
     height: 100vh; */
 }
