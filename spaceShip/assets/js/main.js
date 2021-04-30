@@ -49,7 +49,7 @@ window.onload = function () {
   //bgAudio.play();
 
   /*explMusic = new Audio('assets\\audio\\explosion1.mp3');*/ 
-  explMusic_2 = new Audio('assets\\audio\\explosion2.mp3');
+  //explMusic_2 = new Audio('assets\\audio\\explosion2.mp3');
 
   reDraw();
 };
@@ -134,7 +134,7 @@ function DrawLasers() {
   }
 }*/
 
-var maxAsteroids = 20;
+//var maxAsteroids = 20;
 
 function Asteroid() {
   /*this.alive = true;
@@ -164,7 +164,7 @@ function Asteroid() {
 /*var asteroids = [];
 var explAsteroids = [];*/
 
-function DrawAsteroids() {
+/* function DrawAsteroids() {
   if (
     Math.random() <= 0.09 &&  // создаем новые астероиды
     asteroids.length < maxAsteroids) {
@@ -200,10 +200,10 @@ function DrawAsteroids() {
       currentEx.explLife--;
     }
   }
-}
+} */
 
-var collidedAIndex = -1; // индекс столкновений
-function CheckCollision() {
+//var collidedAIndex = -1; // индекс столкновений
+/* function CheckCollision() {
   for (var i = 0; i < asteroids.length; i++) {
     var currentA = asteroids[i];
 
@@ -239,7 +239,7 @@ function CheckCollision() {
       }
     }
   }
-}
+} */
 
 function clickToStart() { // надпись начала игры
   var playText = 'Click to start';

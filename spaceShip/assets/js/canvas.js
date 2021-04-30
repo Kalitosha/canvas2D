@@ -7,7 +7,7 @@ class Player {
 
     this.speed = 10; // скорость перемещения
     this.score = 0; // счет 
-  
+
     this.health = 3; // количество жизней
     this.healthW = 50; // ширина сердечка
 
@@ -23,7 +23,7 @@ class Player {
     init();
   }
 
-  init(){    
+  init() {
     this.playerIm.src = 'assets\\images\\ship1.png';
     this.shipExpIm.src = 'assets\\images\\explShip.png';
     this.healthIm.src = 'assets\\images\\life.png';
@@ -40,7 +40,7 @@ class Player {
     ctx.drawImage(this.playerIm, this.x, this.y, this.w, this.h);
   }
 
-  expresetExplMusiclMusic(){
+  expresetExplMusiclMusic() {
     this.explMusic.pause();
     this.explMusic.currentTime = 0.0;
   }
@@ -56,7 +56,7 @@ class Player {
     ctx.shadowColor = "#3b95d4";
     ctx.shadowBlur = 15;
     ctx.font = 'bold 28px Comic Sans MS';
-    ctx.textAlign = "right"; 
+    ctx.textAlign = "right";
     ctx.fillText(this.score, WIDTH - 50, 35);
     ctx.shadowBlur = 0;
   }
@@ -80,7 +80,7 @@ class Player {
     }
     for (var i = 0; i < this.lazers.length; i++) {
       let currentL = this.lazers[i];
-  
+
       if (currentL.y > -20) // если все еще на экране
         currentL.drawL();
       else {
@@ -91,12 +91,12 @@ class Player {
 }
 
 
-class Lazer{
-  constructor(player){    
+class Lazer {
+  constructor(player) {
     this.x = player.x + player.w / 2;
     this.y = player.y;
     this.lazerSpeed = 16;
-    
+
   }
 
   drawOneLazer(ctx) {
@@ -109,10 +109,10 @@ class Lazer{
 
 }
 
-class Asteroid{
-  constructor(){
+class Asteroid {
+  constructor() {
     this.alive = true;
-    this.speed = Math.random() * (7-3) + 3; // [3;7)
+    this.speed = Math.random() * (7 - 3) + 3; // [3;7)
     this.x = Math.floor(Math.random() * WIDTH - HEIGHT / 10); //TODO возможно надо сделать их реже
     this.y = 0 - HEIGHT / 10;
     this.h = HEIGHT / 10;
@@ -121,10 +121,10 @@ class Asteroid{
     this.explLife = 6; // для отрисовки спрайта из 6ти картинок
 
     this.explX = 0;
-    this.explWidth = 194;
+    this.explWidth = 194;    
   }
 
-  drawSprite(asteroidIm) {
+  drawSprite(ctx, asteroidIm) {
     ctx.drawImage(asteroidIm, this.x, this.y, this.w, this.h);
     this.y += this.speed;
   }
@@ -143,12 +143,114 @@ class Asteroid{
   }
 }
 
-const player = new Player(WIDTH, HEIGHT);
 
-//TODO добавить еще один надкласс для астероидов и отрисовки фона "космос" // может паттерн фабрика?
-let asteroids = [];
-let explAsteroids = [];
-let asteroidIm = new Image();
-asteroidIm.src = 'assets\\images\\asteroid.png';
-let explIm = new Image();
-explIm.src = 'assets\\images\\spriteMapExpl.png';
+
+
+
+
+//TODO надкласс для астероидов и отрисовки фона "космос" // может паттерн фабрика?
+
+class Space {
+  constructor(WIDTH, HEIGHT) {
+    this.asteroids = []; // живые астероиды
+    this.explAsteroids = []; // взорванные астероиды
+    this.asteroidIm = new Image();
+    this.explIm = new Image();
+
+    this.maxAsteroids = 20;
+    this.collidedAIndex = -1; // индекс столкновений
+
+    this.player = new Player(WIDTH, HEIGHT);
+    this.explMusic = new Audio('assets\\audio\\explosion2.mp3');
+
+    init();
+  }
+
+  init() {
+    this.asteroidIm.src = 'assets\\images\\asteroid.png';
+    this.explIm.src = 'assets\\images\\spriteMapExpl.png';
+  }
+
+  DrawAsteroids(ctx) {
+    if (
+      Math.random() <= 0.09 &&  // создаем новые астероиды
+      this.asteroids.length < this.maxAsteroids) {
+      this.asteroids.push(new Asteroid());
+    }
+
+    for (let i = 0; i < this.asteroids.length; i++) {
+      let currentA = this.asteroids[i]; // делаем удобочитаемую ссылку для удобства
+      if (currentA.alive === false) { // астероид уничтожен
+        this.explAsteroids.push(currentA);
+        this.asteroids.splice(i, 1);
+        continue;
+      }
+      if (currentA.y > HEIGHT + currentA.h) { // астероид улетел за конец экрана
+        this.asteroids.splice(i, 1);
+        continue;
+      }
+      currentA.drawSprite(ctx, this.asteroidIm);
+    }
+
+    for (let i = 0; i < this.explAsteroids.length; i++) {
+      let currentEx = this.explAsteroids[i]; // делаем удобочитаемую ссылку для удобства
+      if (currentEx.explLife <= 0) {
+        this.explAsteroids.splice(i, 1);
+        continue;
+      }
+      if (currentEx.explLife > 0) {
+        currentEx.drawExplosion(ctx, this.explIm);
+        currentEx.explLife--;
+      }
+    }
+  }
+
+  resize(WIDTH, HEIGHT) { //TODO !!!
+
+  }
+
+  CheckCollision(WIDTH, HEIGHT) {
+    for (let i = 0; i < this.asteroids.length; i++) {
+      let currentA = this.asteroids[i];
+
+      // проверяем столкновение игрока с астероидом
+      if ((currentA.x - currentA.w / 4 * 3 <= this.player.x) &&
+        (currentA.x + currentA.w / 4 * 3 >= this.player.x) &&
+        (currentA.y + currentA.h / 3 >= this.player.y) &&
+        (this.collidedAIndex !== this.asteroids.indexOf(currentA))) { // TODO this.asteroids.indexOf(currentA) это же по сути поиск i-го астероида
+        this.collidedAIndex = this.asteroids.indexOf(currentA);
+        this.player.health--;
+        this.player.drawExpSprite();
+      }
+
+      // Сброс индекса столкновения астероида с игроком
+      if (this.collidedAIndex === this.asteroids.indexOf(currentA) && // TODO this.asteroids.indexOf(currentA) это же по сути поиск i-го астероида
+        currentA.y < HEIGHT / 2) {
+        this.collidedAIndex = -1;
+      }
+
+      // столкновение лазера с астероидами
+      for (let j = 0; j < this.player.lazers.length; j++) {
+        let currentL = this.player.lazers[j];
+        if ((currentL.x <= currentA.x + currentA.w) &&
+          (currentL.x >= currentA.x) &&
+          (currentL.y <= currentA.y)) {
+          currentA.alive = false;
+
+          this.explMusic.pause();
+          this.explMusic.currentTime = 0.0;
+          this.explMusic.play();
+
+          player.score++;
+          this.player.lazers.splice(this.player.lazers.indexOf(currentL), 1);
+        }
+      }
+    }
+  }
+
+
+}
+
+
+space = new Space(WIDTH, HEIGHT);
+
