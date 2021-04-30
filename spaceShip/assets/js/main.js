@@ -1,15 +1,15 @@
 ﻿console.log('start')
 
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+/*const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");*/
 
 window.addEventListener('resize', resize);
 document.addEventListener("keydown", KeyDown, true);
 document.addEventListener("keyup", KeyUp, true);
 
-let gameStatus = 'start'; // start, play, end
+/*let gameStatus = 'start'; // start, play, end
 let keys = [false, false, false];
-let isTouch = false;
+let isTouch = false;*/
 
 /*let explIm = new Image();
 explIm.src = 'assets\\images\\spriteMapExpl.png';*/
@@ -32,12 +32,12 @@ asteroidIm.src = 'assets\\images\\asteroid.png';*/
 /*let WIDTH = document.documentElement.clientWidth;
 let HEIGHT = document.documentElement.clientHeight;*/
 
-let WIDTH = window.innerWidth;
-let HEIGHT = window.innerHeight;
+/*let WIDTH = window.innerWidth;
+let HEIGHT = window.innerHeight;*/
 
 window.onload = function () {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  /*canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;*/
 
   /*canvas.width = document.documentElement.clientWidth;
   canvas.height = document.documentElement.clientHeight;*/
@@ -241,7 +241,7 @@ var explAsteroids = [];*/
   }
 } */
 
-function clickToStart() { // надпись начала игры
+/*function clickToStart() { // надпись начала игры
   var playText = 'Click to start';
   ctx.fillStyle = "#cb6e06";
   ctx.shadowColor = "#6446ea";
@@ -250,9 +250,9 @@ function clickToStart() { // надпись начала игры
   ctx.textBaseline = "middle";
   ctx.fillText(playText, WIDTH / 2 - ctx.measureText(playText).width / 2, HEIGHT / 2);
   ctx.shadowBlur = 0;
-}
+}*/
 
-function gameOver() { //TODO!!!! не выводит посередине до resize!!!
+/*function gameOver() { //TODO!!!! не выводит посередине до resize!!!
   canvas.width = document.documentElement.clientWidth;
   canvas.height = document.documentElement.clientHeight;
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -270,7 +270,7 @@ function gameOver() { //TODO!!!! не выводит посередине до r
 
   ctx.font = '100px Comic Sans MS';
   ctx.fillText('your score: ' + player.score, WIDTH / 2 - ctx.measureText(playText).width / 2, HEIGHT / 2 + 150);
-}
+}*/
 
 function gamePlay() {
   CheckCollision();
@@ -330,7 +330,7 @@ function reDraw() {
   canvas.onmousedown = onMouseDown;
 
   canvas.touchstart = touchStart; // Tap (Косание)
-  if (isTouch) {
+  if (isTouch) { 
     lazers.push(new Lazer());
     lazerLoaded = false;
   }

@@ -70,7 +70,7 @@ class Player {
       ctx.drawImage(this.healthIm, 10, 10, this.healthW, 40);
   }
 
-  DrawLasers() {
+  drawLasers() {
     //проверяем расстояние м/д лазерами, достаточно ли оно для выстрела следующего
     if (this.lazers.length !== 0) { // если в массиве есть лазеры
       if (this.lazers[this.lazers.length - 1].y >= this.lazerReloadDistance)
@@ -110,7 +110,7 @@ class Lazer {
 }
 
 class Asteroid {
-  constructor() {
+  constructor(WIDTH, HEIGHT) {
     this.alive = true;
     this.speed = Math.random() * (7 - 3) + 3; // [3;7)
     this.x = Math.floor(Math.random() * WIDTH - HEIGHT / 10); //TODO возможно надо сделать их реже
@@ -121,7 +121,7 @@ class Asteroid {
     this.explLife = 6; // для отрисовки спрайта из 6ти картинок
 
     this.explX = 0;
-    this.explWidth = 194;    
+    this.explWidth = 194;
   }
 
   drawSprite(ctx, asteroidIm) {
@@ -144,12 +144,7 @@ class Asteroid {
 }
 
 
-
-
-
-
-//TODO надкласс для астероидов и отрисовки фона "космос" // может паттерн фабрика?
-
+//надкласс для астероидов
 class Space {
   constructor(WIDTH, HEIGHT) {
     this.asteroids = []; // живые астероиды
@@ -171,7 +166,7 @@ class Space {
     this.explIm.src = 'assets\\images\\spriteMapExpl.png';
   }
 
-  DrawAsteroids(ctx) {
+  drawAsteroids(ctx) {
     if (
       Math.random() <= 0.09 &&  // создаем новые астероиды
       this.asteroids.length < this.maxAsteroids) {
@@ -209,7 +204,7 @@ class Space {
 
   }
 
-  CheckCollision(WIDTH, HEIGHT) {
+  checkCollision(WIDTH, HEIGHT) {
     for (let i = 0; i < this.asteroids.length; i++) {
       let currentA = this.asteroids[i];
 
@@ -247,10 +242,93 @@ class Space {
       }
     }
   }
+}
 
+class gameLoop {
+  constructor(WIDTH, HEIGHT) {
+    this.playText = '';
+
+  }
+
+  startScreen(ctx) { // надпись начала игры
+    ctx.fillStyle = "#cb6e06";
+    ctx.shadowColor = "#6446ea";
+    ctx.shadowBlur = 20;
+    ctx.font = 'bold 150px Comic Sans MS';
+    ctx.textBaseline = "middle";
+    ctx.fillText(this.playText, WIDTH / 2 - ctx.measureText(playText).width / 2, HEIGHT / 2);
+    ctx.shadowBlur = 0;
+  }
+
+  gameOverScreen() { //TODO не выводит посередине до resize ???
+    canvas.width = document.documentElement.clientWidth;
+    canvas.height = document.documentElement.clientHeight;
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+
+    ctx.fillStyle = "#cb6e06";
+    ctx.shadowColor = "#6446ea";
+    ctx.shadowBlur = 25;
+    ctx.font = 'bold 150px Comic Sans MS';
+    ctx.textBaseline = "middle";
+
+    ctx.fillText(this.playText, WIDTH / 2 - ctx.measureText(this.playText).width / 2, HEIGHT / 2);
+    ctx.shadowBlur = 0;
+
+    ctx.font = '100px Comic Sans MS';
+    ctx.fillText('your score: ' + player.score, WIDTH / 2 - ctx.measureText(this.playText).width / 2, HEIGHT / 2 + 150);
+  }
+
+  showText(ctx, status) { // status: start / finish
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+    ctx.fillStyle = "#cb6e06";
+    ctx.shadowColor = "#6446ea";
+    ctx.shadowBlur = 25;
+    ctx.textBaseline = "middle";
+
+    if (status === 'start') {
+      this.this.playText = 'Click to start';
+    }
+    else if (status === 'finish') {      
+      ctx.font = '100px Comic Sans MS';
+      ctx.shadowBlur = 0;
+      ctx.fillText('your score: ' + player.score, WIDTH / 2 - ctx.measureText(this.playText).width / 2, HEIGHT / 2 + 150);
+
+      this.playText = 'GAME OVER';
+    }
+
+    ctx.font = 'bold 150px Comic Sans MS';
+    ctx.fillText(this.playText, WIDTH / 2 - ctx.measureText(this.playText).width / 2, HEIGHT / 2);
+    ctx.shadowBlur = 0;
+
+  }
 
 }
 
 
+
+console.log('it`s work')
+const canvas = document.querySelector(".canvas");
+const ctx = canvas.getContext("2d");
+
+let WIDTH = window.innerWidth;
+let HEIGHT = window.innerHeight;
+
+let gameStatus = 'start'; // start, play, end
+let keys = [false, false, false];
+let isTouch = false;
+/* ---------------------------------------------------------- */
+
 space = new Space(WIDTH, HEIGHT);
 
+
+
+
+
+window.onload = function () {
+  canvas.width = WIDTH;
+  canvas.height = HEIGHT;
+
+  reDraw();
+}
