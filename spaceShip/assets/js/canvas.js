@@ -20,7 +20,7 @@ class Player {
     this.lazerLoaded = true; // перезарядка оружия
     this.lazers = []; // магазин пушки
 
-    init();
+    this.init();
   }
 
   init() {
@@ -70,7 +70,7 @@ class Player {
       ctx.drawImage(this.healthIm, 10, 10, this.healthW, 40);
   }
 
-  drawLasers() {
+  drawLasers(ctx) {
     //проверяем расстояние м/д лазерами, достаточно ли оно для выстрела следующего
     if (this.lazers.length !== 0) { // если в массиве есть лазеры
       if (this.lazers[this.lazers.length - 1].y >= this.lazerReloadDistance)
@@ -82,7 +82,7 @@ class Player {
       let currentL = this.lazers[i];
 
       if (currentL.y > -20) // если все еще на экране
-        currentL.drawL();
+        currentL.drawOneLazer(ctx);
       else {
         this.lazers.splice(i, 1); // начиная с i удалили один эл-т
       }
@@ -158,7 +158,7 @@ class Space {
     this.player = new Player(WIDTH, HEIGHT);
     this.explMusic = new Audio('assets\\audio\\explosion2.mp3');
 
-    init();
+    this.init();
   }
 
   init() {
@@ -247,39 +247,18 @@ class Space {
 class gameLoop {
   constructor(WIDTH, HEIGHT) {
     this.playText = '';
+    this.bgIm = new Image();
+    this.gameStatus = 'start'; // start, play, finish
+    this.backgroundHeight = 0;
 
+    this.init();
   }
 
-  startScreen(ctx) { // надпись начала игры
-    ctx.fillStyle = "#cb6e06";
-    ctx.shadowColor = "#6446ea";
-    ctx.shadowBlur = 20;
-    ctx.font = 'bold 150px Comic Sans MS';
-    ctx.textBaseline = "middle";
-    ctx.fillText(this.playText, WIDTH / 2 - ctx.measureText(playText).width / 2, HEIGHT / 2);
-    ctx.shadowBlur = 0;
+  init() {
+    this.bgIm.src = 'assets\\images\\background.png';
   }
 
-  gameOverScreen() { //TODO не выводит посередине до resize ???
-    canvas.width = document.documentElement.clientWidth;
-    canvas.height = document.documentElement.clientHeight;
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-
-
-    ctx.fillStyle = "#cb6e06";
-    ctx.shadowColor = "#6446ea";
-    ctx.shadowBlur = 25;
-    ctx.font = 'bold 150px Comic Sans MS';
-    ctx.textBaseline = "middle";
-
-    ctx.fillText(this.playText, WIDTH / 2 - ctx.measureText(this.playText).width / 2, HEIGHT / 2);
-    ctx.shadowBlur = 0;
-
-    ctx.font = '100px Comic Sans MS';
-    ctx.fillText('your score: ' + player.score, WIDTH / 2 - ctx.measureText(this.playText).width / 2, HEIGHT / 2 + 150);
-  }
-
-  showText(ctx, status) { // status: start / finish
+  showText(ctx) {
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
     ctx.fillStyle = "#cb6e06";
@@ -287,10 +266,10 @@ class gameLoop {
     ctx.shadowBlur = 25;
     ctx.textBaseline = "middle";
 
-    if (status === 'start') {
+    if (this.gameStatus === 'start') {
       this.this.playText = 'Click to start';
     }
-    else if (status === 'finish') {      
+    else if (this.gameStatus === 'finish') {
       ctx.font = '100px Comic Sans MS';
       ctx.shadowBlur = 0;
       ctx.fillText('your score: ' + player.score, WIDTH / 2 - ctx.measureText(this.playText).width / 2, HEIGHT / 2 + 150);
@@ -304,6 +283,93 @@ class gameLoop {
 
   }
 
+  drawBackground(ctx, heightBg) { //TODO надо оптимизировать (3 раза почти один и тот же код)
+    let bgW = 0;
+    let bgH = heightBg - HEIGHT - this.bgIm.height / 3.2;
+    if (this.gameStatus === 'play') {
+      while (bgW < WIDTH) {
+        while (bgH < heightBg) {
+          ctx.drawImage(this.bgIm, bgW, bgH);
+          bgH += this.bgIm.height;
+        }
+        bgW += this.bgIm.width;
+        bgH = heightBg - HEIGHT - this.bgIm.height / 3.2;
+      }
+
+      bgW = 0;
+      bgH = heightBg;
+
+      while (bgW < WIDTH) {
+        while (bgH < HEIGHT) {
+          ctx.drawImage(this.bgIm, bgW, bgH);
+          bgH += this.bgIm.height;
+        }
+        bgW += this.bgIm.width;
+        bgH = heightBg;
+      }
+    }
+    else {
+      bgW = 0;
+      bgH = 0;
+
+      while (bgW < WIDTH) {
+        while (bgH < HEIGHT) {
+          ctx.drawImage(this.bgIm, bgW, bgH);
+          bgH += this.bgIm.height;
+        }
+        bgW += this.bgIm.width;
+        bgH = 0;
+      }
+    }
+  }
+
+  gamePlay(ctx, WIDTH, HEIGHT, space) { //!!! TODO мб тут лучше сделать колбек
+    space.checkCollision(WIDTH, HEIGHT);
+    space.drawAsteroids(ctx);
+    space.player.drawLasers(ctx);
+    space.player.drawSprite(ctx);
+    space.player.drawScore(ctx);
+    space.player.drawHealth(ctx);
+    if (space.player.health <= 0) {
+      this.gameStatus = 'finish';
+    }
+  }
+
+  reDraw() { //! TODO ??? 
+    /************************************* */
+    /*********можно убрать отсюда***********/
+    canvas.onmousemove = mouseMove;
+    canvas.onmousedown = onMouseDown;
+  
+    canvas.touchstart = touchStart; // Tap (Косание)
+    if (isTouch) { 
+      lazers.push(new Lazer());
+      lazerLoaded = false;
+    }
+    /************************************* */
+
+
+    if ((backgroundHeight > HEIGHT) && (backgroundHeight % bgIm.height) === 0) // % чтобы не дергался
+      backgroundHeight = 0;
+    else
+      backgroundHeight += 2;
+  
+    drawBackground(backgroundHeight);
+  
+    switch (gameStatus) {
+      case 'start':
+        clickToStart();
+        break;
+      case 'play':
+        gamePlay();
+        break;
+      case 'end':
+        gameOver();
+        break;
+    }
+    window.requestAnimationFrame(reDraw); //! TODO ??? 
+  }
+
 }
 
 
@@ -315,7 +381,7 @@ const ctx = canvas.getContext("2d");
 let WIDTH = window.innerWidth;
 let HEIGHT = window.innerHeight;
 
-let gameStatus = 'start'; // start, play, end
+
 let keys = [false, false, false];
 let isTouch = false;
 /* ---------------------------------------------------------- */

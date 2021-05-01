@@ -272,7 +272,7 @@ var explAsteroids = [];*/
   ctx.fillText('your score: ' + player.score, WIDTH / 2 - ctx.measureText(playText).width / 2, HEIGHT / 2 + 150);
 }*/
 
-function gamePlay() {
+/*function gamePlay() {
   CheckCollision();
   DrawAsteroids();
   DrawLasers();
@@ -282,9 +282,9 @@ function gamePlay() {
   if (player.health <= 0) {
     gameStatus = 'end';
   }
-}
+}*/
 
-function drawBackground(heightBg) {
+/*function  drawBackground(heightBg) {
   if (gameStatus === 'play') {
 
     bgW = 0;
@@ -321,11 +321,11 @@ function drawBackground(heightBg) {
       bgH = 0;
     }
   }
-}
+} */
 
-var backgroundHeight = 0;
+//let backgroundHeight = 0;
 
-function reDraw() {
+/*function reDraw() {
   canvas.onmousemove = mouseMove;
   canvas.onmousedown = onMouseDown;
 
@@ -354,7 +354,7 @@ function reDraw() {
       break;
   }
   window.requestAnimationFrame(reDraw);
-}
+}*/
 
 function onMouseDown() {
   console.log('onMouseDown')
