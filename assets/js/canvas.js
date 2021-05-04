@@ -11,7 +11,7 @@ class Player {
     this.health = 3; // количество жизней
     this.healthW = 50; // ширина сердечка
 
-    this.explMusic = new Audio('assets\\audio\\explosion1.mp3');
+    //this.explMusic = new Audio('assets\\audio\\explosion1.mp3');
     this.playerIm = new Image();
     this.shipExpIm = new Image();
     this.healthIm = new Image();
@@ -24,9 +24,9 @@ class Player {
   }
 
   init() {
-    this.playerIm.src = 'assets\\images\\ship1.png';
-    this.shipExpIm.src = 'assets\\images\\explShip.png';
-    this.healthIm.src = 'assets\\images\\life.png';
+    this.playerIm.src = 'assets\\images\\ship1.webp';
+    this.shipExpIm.src = 'assets\\images\\explShip.webp';
+    this.healthIm.src = 'assets\\images\\life.webp';
   }
 
   resize(WIDTH, HEIGHT) {
@@ -40,15 +40,15 @@ class Player {
     ctx.drawImage(this.playerIm, this.x, this.y, this.w, this.h);
   }
 
-  expresetExplMusiclMusic() {
-    this.explMusic.pause();
+  /*resetExplMusic() {
+    this.explMusic.pause(); // !!! TODO https://developers.google.com/web/updates/2017/06/play-request-was-interrupted
     this.explMusic.currentTime = 0.0;
-  }
+  }*/
 
   drawExpSprite() {
-    resetExplMusic();
+    //this.resetExplMusic();
     ctx.drawImage(this.shipExpIm, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
-    this.explMusic.play();
+    /*this.explMusic.play();*/
   }
 
   drawScore(ctx) {
@@ -93,6 +93,7 @@ class Player {
 
 class Lazer {
   constructor(player) {
+
     this.x = player.x + player.w / 2;
     this.y = player.y;
     this.lazerSpeed = 16;
@@ -110,9 +111,9 @@ class Lazer {
 }
 
 class Asteroid {
-  constructor(WIDTH, HEIGHT) {
+  constructor() {
     this.alive = true;
-    this.speed = Math.random() * (7 - 3) + 3; // [3;7)
+    this.speed = 4; //Math.random() * (7 - 3) + 3; // [3;7)
     this.x = Math.floor(Math.random() * WIDTH - HEIGHT / 10); //TODO возможно надо сделать их реже
     this.y = 0 - HEIGHT / 10;
     this.h = HEIGHT / 10;
@@ -125,9 +126,15 @@ class Asteroid {
   }
 
   drawSprite(ctx, asteroidIm) {
+    //console.log('drawSprite', this);
     ctx.drawImage(asteroidIm, this.x, this.y, this.w, this.h);
+    
+  }
+
+  move(){
     this.y += this.speed;
   }
+
 
   drawExplosion(ctx, explIm) {
     ctx.drawImage(explIm, this.explX, 0, this.explWidth, explIm.height, this.x, this.y, this.w, this.h);
@@ -156,17 +163,18 @@ class Space {
     this.collidedAIndex = -1; // индекс столкновений
 
     this.player = new Player(WIDTH, HEIGHT);
-    this.explMusic = new Audio('assets\\audio\\explosion2.mp3');
+    //this.explMusic = new Audio('assets\\audio\\explosion2.mp3');
 
     this.init();
   }
 
   init() {
-    this.asteroidIm.src = 'assets\\images\\asteroid.png';
-    this.explIm.src = 'assets\\images\\spriteMapExpl.png';
+    this.asteroidIm.src = 'assets\\images\\asteroid.webp';
+    this.explIm.src = 'assets\\images\\spriteMapExpl.webp';
   }
 
   drawAsteroids(ctx) {
+    //console.log('drawAsteroids')
     if (
       Math.random() <= 0.09 &&  // создаем новые астероиды
       this.asteroids.length < this.maxAsteroids) {
@@ -185,6 +193,7 @@ class Space {
         continue;
       }
       currentA.drawSprite(ctx, this.asteroidIm);
+      currentA.move();
     }
 
     for (let i = 0; i < this.explAsteroids.length; i++) {
@@ -201,6 +210,12 @@ class Space {
   }
 
   resize(WIDTH, HEIGHT) { //TODO !!!
+    this.player.resize(WIDTH, HEIGHT)
+    //this.asteroids.forEach(el => {
+    for (let value of this.asteroids) {
+      value.resize(WIDTH, HEIGHT);
+      //console.log(value);
+    }
 
   }
 
@@ -232,11 +247,11 @@ class Space {
           (currentL.y <= currentA.y)) {
           currentA.alive = false;
 
-          this.explMusic.pause();
+          /*this.explMusic.pause();
           this.explMusic.currentTime = 0.0;
-          this.explMusic.play();
+          this.explMusic.play();*/
 
-          player.score++;
+          this.player.score++;
           this.player.lazers.splice(this.player.lazers.indexOf(currentL), 1);
         }
       }
@@ -244,7 +259,7 @@ class Space {
   }
 }
 
-class gameLoop {
+class GameLoop {
   constructor(WIDTH, HEIGHT) {
     this.playText = '';
     this.bgIm = new Image();
@@ -255,24 +270,23 @@ class gameLoop {
   }
 
   init() {
-    this.bgIm.src = 'assets\\images\\background.png';
+    this.bgIm.src = 'assets\\images\\background.webp';
   }
 
   showText(ctx) {
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
     ctx.fillStyle = "#cb6e06";
-    ctx.shadowColor = "#6446ea";
+    ctx.shadowColor = "#392388";
     ctx.shadowBlur = 25;
     ctx.textBaseline = "middle";
 
     if (this.gameStatus === 'start') {
-      this.this.playText = 'Click to start';
+      this.playText = 'Click to start';
     }
     else if (this.gameStatus === 'finish') {
       ctx.font = '100px Comic Sans MS';
-      ctx.shadowBlur = 0;
-      ctx.fillText('your score: ' + player.score, WIDTH / 2 - ctx.measureText(this.playText).width / 2, HEIGHT / 2 + 150);
+      ctx.fillText('your score: ' + space.player.score, WIDTH / 2 - ctx.measureText(this.playText).width / 2, HEIGHT / 2 + 150);
 
       this.playText = 'GAME OVER';
     }
@@ -280,7 +294,6 @@ class gameLoop {
     ctx.font = 'bold 150px Comic Sans MS';
     ctx.fillText(this.playText, WIDTH / 2 - ctx.measureText(this.playText).width / 2, HEIGHT / 2);
     ctx.shadowBlur = 0;
-
   }
 
   drawBackground(ctx, heightBg) { //TODO надо оптимизировать (3 раза почти один и тот же код)
@@ -311,9 +324,9 @@ class gameLoop {
     else {
       bgW = 0;
       bgH = 0;
-
       while (bgW < WIDTH) {
         while (bgH < HEIGHT) {
+          
           ctx.drawImage(this.bgIm, bgW, bgH);
           bgH += this.bgIm.height;
         }
@@ -324,6 +337,7 @@ class gameLoop {
   }
 
   gamePlay(ctx, WIDTH, HEIGHT, space) { //!!! TODO мб тут лучше сделать колбек
+    //console.log('gamePlay')
     space.checkCollision(WIDTH, HEIGHT);
     space.drawAsteroids(ctx);
     space.player.drawLasers(ctx);
@@ -335,40 +349,12 @@ class gameLoop {
     }
   }
 
-  reDraw() { //! TODO ??? 
-    /************************************* */
-    /*********можно убрать отсюда***********/
-    canvas.onmousemove = mouseMove;
-    canvas.onmousedown = onMouseDown;
   
-    canvas.touchstart = touchStart; // Tap (Косание)
-    if (isTouch) { 
-      lazers.push(new Lazer());
-      lazerLoaded = false;
-    }
-    /************************************* */
 
+  /* resize(ctx, WIDTH, HEIGHT){
+    showText(ctx);
 
-    if ((backgroundHeight > HEIGHT) && (backgroundHeight % bgIm.height) === 0) // % чтобы не дергался
-      backgroundHeight = 0;
-    else
-      backgroundHeight += 2;
-  
-    drawBackground(backgroundHeight);
-  
-    switch (gameStatus) {
-      case 'start':
-        clickToStart();
-        break;
-      case 'play':
-        gamePlay();
-        break;
-      case 'end':
-        gameOver();
-        break;
-    }
-    window.requestAnimationFrame(reDraw); //! TODO ??? 
-  }
+  }*/
 
 }
 
@@ -387,7 +373,7 @@ let isTouch = false;
 /* ---------------------------------------------------------- */
 
 space = new Space(WIDTH, HEIGHT);
-
+gameLoop = new GameLoop(WIDTH, HEIGHT)
 
 
 
@@ -396,5 +382,207 @@ window.onload = function () {
   canvas.width = WIDTH;
   canvas.height = HEIGHT;
 
-  reDraw();
+  console.log('onload')
+  //setTimeout(reDraw(), 2000);
+  reDraw()
+
+}
+
+
+function reDraw() { //! TODO ??? 
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  /************************************* */
+  /*********можно убрать отсюда***********/
+  canvas.onmousemove = mouseMove;
+  canvas.onmousedown = onMouseDown;
+
+  canvas.touchstart = touchStart; // Tap (Косание)
+  if (isTouch) { 
+    space.player.lazers.push(new Lazer(space.player));
+    space.player.lazerLoaded = false;
+  }
+  /************************************* */
+
+  if ((gameLoop.backgroundHeight > HEIGHT) && (gameLoop.backgroundHeight % gameLoop.bgIm.height) === 0) // % чтобы не дергался
+    gameLoop.backgroundHeight = 0;
+  else
+    gameLoop.backgroundHeight += 2;
+  gameLoop.drawBackground(ctx, gameLoop.backgroundHeight);
+
+
+  switch (gameLoop.gameStatus) {
+    case 'start':
+      gameLoop.showText(ctx);
+      break;
+    case 'play':
+      gameLoop.gamePlay(ctx, WIDTH, HEIGHT, space);
+      //console.log('gameLoop.gameStatus = ', gameLoop.gameStatus)
+      break;
+    case 'finish':
+      gameLoop.showText(ctx);
+      break;
+  }  
+  
+  //console.log('gameLoop.gameStatus = ', gameLoop.gameStatus)
+  //setTimeout(window.requestAnimationFrame(reDraw()), 1500);
+  window.requestAnimationFrame(reDraw); //! TODO ??? 
+}
+
+/*****************обработчики***********************/
+window.addEventListener('resize', resize);
+document.addEventListener("keydown", KeyDown, true);
+document.addEventListener("keyup", KeyUp, true);
+
+
+function KeyDown() {}
+function KeyUp() {}
+function touchStart() {}
+
+
+function onMouseDown() {
+  console.log('onMouseDown')  
+  
+  switch (gameLoop.gameStatus) {
+    case 'start':
+      gameLoop.gameStatus = 'play';
+      space.player.health = 3;
+      space.player.score = 0;
+      break;
+    case 'play':
+      if (space.player.lazerLoaded) {
+        space.player.lazers.push(new Lazer(space.player));
+        space.player.lazerLoaded = false;
+      }
+      break;
+    case 'finish': 
+      gameLoop.gameStatus = 'start';
+      space.player.lazers = [];
+      space.asteroids = [];
+      break;
+  }  
+}
+
+
+var mouseMove = function (e) {
+  space.player.x = e.clientX - space.player.w / 2;
+};
+
+
+function pressingButton() {
+  console.log('pressingButton: KeyDown/KeyUp')
+  switch (gameLoop.gameStatus) {
+    case 'start':
+      gameLoop.gameStatus = 'play';
+      space.player.health = 3;
+      space.player.score = 0;
+      break;
+    case 'play':
+      if (keys[0] == true && keys[1] == false && space.player.x <= WIDTH - space.player.w) {
+        space.player.x += space.player.vx;
+      }
+      if (keys[1] == true && keys[0] == false && space.player.x > 0) {
+        space.player.x -= space.player.vx;
+      }
+      if (keys[2] == true) {
+        if (space.player.lazerLoaded) {
+          space.player.lazers.push(new Lazer(space.player)); 
+          space.player.lazerLoaded == false;
+        }
+      }
+      break;
+    case 'finish':
+      gameLoop.gameStatus = 'start';
+      space.player.lazers = [];
+      space.asteroids = [];
+      break;
+  }
+}
+
+
+/*
+function KeyDown(e) {
+  console.log('KeyDown')
+  if (e.keyCode == 39) {
+    keys[0] = true;
+  }
+  else if (e.keyCode == 37) {
+    keys[1] = true;
+  }
+  pressingButton();
+}
+*/
+
+/*
+function KeyUp(e) {
+  console.log('KeyUp')
+  if (e.keyCode == 39) { // Right
+    keys[0] = false;
+  }
+  else if (e.keyCode == 37) { // Left
+    keys[1] = false;
+  }
+  if (e.keyCode == 32) {// Space
+    keys[2] = true;
+    pressingButton();
+    keys[2] = false;
+  }
+}
+*/
+
+/*
+canvas.addEventListener(
+  'touchmove',
+  function (e) {
+    console.log('touchmove')
+    e.stopImmediatePropagation()
+    e.preventDefault(); // Предотвращение скролла ???
+    //e.stopPropagation(); //останавливает "всплытие" вызова события к родительским элементам
+    /* далее код обработки события*/
+    /*if (e.targetTouches.length === 1) {
+      let touch = e.targetTouches[0];
+      isTouch === true;
+      space.player.x = touch.pageX - space.player.w / 2;
+    }
+  }
+);
+*/
+
+/*
+function touchStart() {
+  console.log('touchStart')
+  isTouch === true;
+  switch (gameLoop.gameStatus) {
+    case 'start':
+      gameLoop.gameStatus = 'play';
+      space.player.health = 3;
+      space.player.score = 0;
+      break;
+    case 'play':
+      if (space.player.lazerLoaded) {
+        space.player.llazers.push(new Lazer(space.player));
+        space.player.llazerLoaded = false;
+      }
+      break;
+    case 'end':
+      gameLoop.gameStatus = 'start';
+      space.player.llazers = [];
+      space.asteroids = [];
+      break;
+  }
+}
+*/
+
+function resize(e) {
+  console.log('resize')
+  //console.log(e.target)
+
+  canvas.width = e.target.innerWidth;
+  canvas.height = e.target.innerHeight;
+
+  WIDTH = e.target.innerWidth;
+  HEIGHT = e.target.innerHeight;
+
+  //space.resize(WIDTH, HEIGHT);
 }

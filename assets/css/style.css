@@ -7,8 +7,8 @@
     align-items: center;
 }
 
-#canvas{
-    background-color: rgb(24, 28, 77);
+.canvas{
+    background-color: #1A103D;
     background-image: url('../images/background.png');
 	margin:0.1px;
 	padding:0;

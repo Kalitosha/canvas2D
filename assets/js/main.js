@@ -3,9 +3,9 @@
 /*const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");*/
 
-window.addEventListener('resize', resize);
+/* window.addEventListener('resize', resize);
 document.addEventListener("keydown", KeyDown, true);
-document.addEventListener("keyup", KeyUp, true);
+document.addEventListener("keyup", KeyUp, true); */
 
 /*let gameStatus = 'start'; // start, play, end
 let keys = [false, false, false];
@@ -14,8 +14,8 @@ let isTouch = false;*/
 /*let explIm = new Image();
 explIm.src = 'assets\\images\\spriteMapExpl.png';*/
 
-bgIm = new Image();
-bgIm.src = 'assets\\images\\background.png';
+/* bgIm = new Image();
+bgIm.src = 'assets\\images\\background.png'; */
 
 /*let healthIm = new Image();
 healthIm.src = 'assets\\images\\life.png';*/
@@ -355,8 +355,8 @@ var explAsteroids = [];*/
   }
   window.requestAnimationFrame(reDraw);
 }*/
-
-function onMouseDown() {
+ 
+/*function onMouseDown() {
   console.log('onMouseDown')
   switch (gameStatus) {
     case 'start':
@@ -376,13 +376,13 @@ function onMouseDown() {
       asteroids = [];
       break;
   }
-}
+} */
 
-var mouseMove = function (e) {
+/* var mouseMove = function (e) {
   player.x = e.clientX - player.w / 2;
-};
+}; */
 
-function pressingButton() {
+/* function pressingButton() {
   console.log('pressingButton')
   switch (gameStatus) {
     case 'start':
@@ -410,9 +410,9 @@ function pressingButton() {
       asteroids = [];
       break;
   }
-}
+} */
 
-function KeyDown(e) {
+/* function KeyDown(e) {
   console.log('KeyDown')
   if (e.keyCode == 39) {
     keys[0] = true;
@@ -421,9 +421,9 @@ function KeyDown(e) {
     keys[1] = true;
   }
   pressingButton();
-}
+} */
 
-function KeyUp(e) {
+/* function KeyUp(e) {
   console.log('KeyUp')
   if (e.keyCode == 39) { // Right
     keys[0] = false;
@@ -436,27 +436,27 @@ function KeyUp(e) {
     pressingButton();
     keys[2] = false;
   }
-}
+} */
 
 
 
-document.addEventListener(
+/* document.addEventListener(
   'touchmove',
   function (e) {
     console.log('touchmove')
     e.stopImmediatePropagation()
     e.preventDefault(); // Предотвращение скролла
     e.stopPropagation(); //останавливает "всплытие" вызова события к родительским элементам
-    /* далее код обработки события*/
+    /* далее код обработки события*//*
     if (e.targetTouches.length === 1) {
       var touch = e.targetTouches[0];
       isTouch === true;
       player.x = touch.pageX - player.w / 2;
     }
   }
-);
+); */
 
-function touchStart() {
+/* function touchStart() {
   console.log('touchStart')
   isTouch === true;
   switch (gameStatus) {
@@ -477,10 +477,10 @@ function touchStart() {
       asteroids = [];
       break;
   }
-}
+} */
 
 
-function resize(e) {
+/* function resize(e) {
   console.log('resize')
   //console.log(e.target)
 
@@ -489,7 +489,7 @@ function resize(e) {
 
   WIDTH = e.target.innerWidth;
   HEIGHT = e.target.innerHeight;
-}
+} */
 
 /*
 document.addEventListener('dblclick', function (e) {
