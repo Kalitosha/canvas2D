@@ -44,18 +44,30 @@ class Player {
     this.h = HEIGHT / 9; // высота
   }
 
+  reset(){
+    this.x = WIDTH / 2 - HEIGHT / 10 / 2; // координата х
+    this.y = HEIGHT - HEIGHT / 9 - 15; // координата у
+    this.w = HEIGHT / 10; // ширина
+    this.h = HEIGHT / 9; // высота
+
+    this.currentExplLife = 14;
+    this.score = 0; // счет 
+    this.health = 3; // количество жизней
+    this.lazers = [];
+  }
+
   drawSprite(ctx) {
     if(this.health > 0){
       ctx.drawImage(this.playerIm, this.x, this.y, this.w, this.h);
     }
-    else{
+    /*else{
       let life = this.explLife - this.currentExplLife; // 14 - 13
     
       //ctx.drawImage(this.shipExpIm_sprite, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
       ctx.drawImage(this.shipExpIm_sprite, this.explWidth * life, 0, this.explWidth, this.shipExpIm_sprite.height, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
-      
+
       this.currentExplLife--;
-    }
+    }*/
   }
 
   /*resetExplMusic() {
@@ -66,7 +78,7 @@ class Player {
   drawExpSprite(ctx) {
     //this.resetExplMusic();
 
-    //ctx.drawImage(this.shipExpIm, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
+    ctx.drawImage(this.shipExpIm, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
 
     //ctx.drawImage(this.shipExpIm_2, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);   
     /*this.explMusic.play();*/
@@ -74,18 +86,16 @@ class Player {
     /*ctx.drawImage(explIm, this.explX, 0, this.explWidth, explIm.height, this.x, this.y, this.w, this.h);
     this.explX += this.explWidth;*/
 
-    let life = this.explLife - this.currentExplLife; // 14 - 13
+    /*let life = this.explLife - this.currentExplLife; // 14 - 13
     
     //ctx.drawImage(this.shipExpIm_sprite, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
     ctx.drawImage(this.shipExpIm_sprite, this.explWidth * life, 0, this.explWidth, this.shipExpIm_sprite.height, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
 
     //this.explX += this.explWidth;
     this.currentExplLife--;
-    
+    */
 
     //ctx.drawImage(this.shipExpIm_sprite, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
-    
-    
     
   }
 
@@ -209,6 +219,11 @@ class Space {
     this.explIm.src = 'assets\\images\\spriteMapExpl.webp';
   }
 
+  reset(){
+    this.asteroids = [];
+    this.player.reset();
+  }
+
   drawAsteroids(ctx) {
     //console.log('drawAsteroids')
     if (
@@ -276,7 +291,8 @@ class Space {
           this.player.currentExplLife--;
         }*/
 
-        //this.player.drawExpSprite(ctx);
+        this.player.drawExpSprite(ctx);
+        //this.player.drawSprite(ctx);
       }
 
       // Сброс индекса столкновения астероида с игроком
@@ -395,8 +411,6 @@ class GameLoop {
     }
   }
 
-
-
   /* resize(ctx, WIDTH, HEIGHT){
     showText(ctx);
 
@@ -461,6 +475,7 @@ function reDraw() { //! TODO ???
   switch (gameLoop.gameStatus) {
     case 'start':
       gameLoop.showText(ctx);
+      space.reset();
       break;
     case 'play':
       gameLoop.gamePlay(ctx, WIDTH, HEIGHT, space);
@@ -493,8 +508,8 @@ function onMouseDown() {
   switch (gameLoop.gameStatus) {
     case 'start':
       gameLoop.gameStatus = 'play';
-      space.player.health = 3;
-      space.player.score = 0;
+      //space.player.health = 3;
+      //space.player.score = 0;
       break;
     case 'play':
       if (space.player.lazerLoaded) {
@@ -504,8 +519,8 @@ function onMouseDown() {
       break;
     case 'finish':
       gameLoop.gameStatus = 'start';
-      space.player.lazers = [];
-      space.asteroids = [];
+      //space.player.lazers = [];
+      //space.asteroids = [];
       break;
   }
 }
