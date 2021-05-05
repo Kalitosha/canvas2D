@@ -18,7 +18,7 @@ class Player {
 
     this.shipExpIm_sprite = new Image();
     this.explLife = 14; // для отрисовки спрайта из 14ти картинок
-    this.currentExplLife = 14;
+    this.currentExplLife = this.explLife;
     this.explWidth = 112;
     this.explX;
 
@@ -44,7 +44,7 @@ class Player {
     this.h = HEIGHT / 9; // высота
   }
 
-  reset(){
+  reset() {
     this.x = WIDTH / 2 - HEIGHT / 10 / 2; // координата х
     this.y = HEIGHT - HEIGHT / 9 - 15; // координата у
     this.w = HEIGHT / 10; // ширина
@@ -57,17 +57,26 @@ class Player {
   }
 
   drawSprite(ctx) {
-    if(this.health > 0){
+    if (this.currentExplLife === this.explLife) { 
       ctx.drawImage(this.playerIm, this.x, this.y, this.w, this.h);
     }
-    /*else{
+    else { // если игрок взорвался, надо отрисовать взрыв
       let life = this.explLife - this.currentExplLife; // 14 - 13
-    
+
+      if(life <= 4){
+        ctx.drawImage(this.shipExpIm, this.x, this.y, this.w, this.h);
+      }
+
       //ctx.drawImage(this.shipExpIm_sprite, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
       ctx.drawImage(this.shipExpIm_sprite, this.explWidth * life, 0, this.explWidth, this.shipExpIm_sprite.height, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
 
       this.currentExplLife--;
-    }*/
+      console.log('currentExplLife ', this.currentExplLife)
+
+      if (this.currentExplLife === 0) {
+        this.currentExplLife = this.explLife;
+      }
+    }
   }
 
   /*resetExplMusic() {
@@ -96,7 +105,7 @@ class Player {
     */
 
     //ctx.drawImage(this.shipExpIm_sprite, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
-    
+
   }
 
   drawScore(ctx) {
@@ -219,7 +228,7 @@ class Space {
     this.explIm.src = 'assets\\images\\spriteMapExpl.webp';
   }
 
-  reset(){
+  reset() {
     this.asteroids = [];
     this.player.reset();
   }
@@ -271,34 +280,44 @@ class Space {
   }
 
   checkCollision(ctx, WIDTH, HEIGHT) {
+    //console.log('currentExplLife ', this.player.currentExplLife)
+    //console.log('explLife ', this.player.explLife)
+
     for (let i = 0; i < this.asteroids.length; i++) {
       let currentA = this.asteroids[i];
 
-      // проверяем столкновение игрока с астероидом
-      if ((currentA.x - currentA.w / 4 * 3 <= this.player.x) &&
-        (currentA.x + currentA.w / 4 * 3 >= this.player.x) &&
-        (currentA.y + currentA.h / 3 >= this.player.y) &&
-        (this.collidedAIndex !== this.asteroids.indexOf(currentA))) { // TODO this.asteroids.indexOf(currentA) это же по сути поиск i-го астероида
-        this.collidedAIndex = this.asteroids.indexOf(currentA);
-        this.player.health--;
-
-        /*for (let i = 0; i < this.player.explLife; i++) {
-          this.player.drawExpSprite(ctx);
-          this.player.currentExplLife--;          
-        }*/
-        /*if (this.player.currentExplLife > 0) {
-          this.player.drawExpSprite(ctx);
-          this.player.currentExplLife--;
-        }*/
-
-        this.player.drawExpSprite(ctx);
+      if (this.player.currentExplLife !== this.player.explLife) { // если игрок взорвался, надо отрисовать взрыв
         //this.player.drawSprite(ctx);
+        console.log('expl')
       }
+      else {
+        // проверяем столкновение игрока с астероидом
+        if ((currentA.x - currentA.w / 4 * 3 <= this.player.x) &&
+          (currentA.x + currentA.w / 4 * 3 >= this.player.x) &&
+          (currentA.y + currentA.h / 3 >= this.player.y) &&
+          (this.collidedAIndex !== this.asteroids.indexOf(currentA))) { // TODO this.asteroids.indexOf(currentA) это же по сути поиск i-го астероида
+          this.collidedAIndex = this.asteroids.indexOf(currentA);
+          this.player.health--;
+          this.player.currentExplLife--;
 
-      // Сброс индекса столкновения астероида с игроком
-      if (this.collidedAIndex === this.asteroids.indexOf(currentA) && // TODO this.asteroids.indexOf(currentA) это же по сути поиск i-го астероида
-        currentA.y < HEIGHT / 2) {
-        this.collidedAIndex = -1;
+          /*for (let i = 0; i < this.player.explLife; i++) {
+            this.player.drawExpSprite(ctx);
+            this.player.currentExplLife--;          
+          }*/
+          /*if (this.player.currentExplLife > 0) {
+            this.player.drawExpSprite(ctx);
+            this.player.currentExplLife--;
+          }*/
+
+          //this.player.drawExpSprite(ctx);
+          //this.player.drawSprite(ctx);
+        }
+
+        // Сброс индекса столкновения астероида с игроком
+        if (this.collidedAIndex === this.asteroids.indexOf(currentA) && // TODO this.asteroids.indexOf(currentA) это же по сути поиск i-го астероида
+          currentA.y < HEIGHT / 2) {
+          this.collidedAIndex = -1;
+        }
       }
 
       // столкновение лазера с астероидами
@@ -318,6 +337,7 @@ class Space {
         }
       }
     }
+
   }
 }
 
@@ -400,13 +420,21 @@ class GameLoop {
 
   gamePlay(ctx, WIDTH, HEIGHT, space) {
     //console.log('gamePlay')
+
+    if ((this.backgroundHeight > HEIGHT) && (this.backgroundHeight % this.bgIm.height) === 0) // % чтобы не дергался
+      this.backgroundHeight = 0;
+    else
+      this.backgroundHeight += 2;
+
+    this.drawBackground(ctx, this.backgroundHeight);
+
     space.checkCollision(ctx, WIDTH, HEIGHT);
     space.drawAsteroids(ctx);
     space.player.drawLasers(ctx);
     space.player.drawSprite(ctx); // TODO тут надо как-то организовать взрыв на переднем плане
     space.player.drawScore(ctx);
     space.player.drawHealth(ctx);
-    if (space.player.health <= 0) {
+    if ((space.player.health <= 0) && (space.player.explLife === space.player.currentExplLife)) {
       this.gameStatus = 'finish';
     }
   }
@@ -444,6 +472,15 @@ window.onload = function () {
 
   console.log('onload')
   //setTimeout(reDraw(), 2000);
+
+
+  canvas.onmousemove = mouseMove;
+  canvas.onmousedown = onMouseDown;
+
+  canvas.touchstart = touchStart; // Tap (Косание)
+
+
+
   reDraw()
 
 }
@@ -455,21 +492,15 @@ function reDraw() { //! TODO ???
   canvas.height = window.innerHeight;
   /************************************* */
   /*********можно убрать отсюда***********/
-  canvas.onmousemove = mouseMove;
+  /*canvas.onmousemove = mouseMove;
   canvas.onmousedown = onMouseDown;
 
-  canvas.touchstart = touchStart; // Tap (Косание)
+  canvas.touchstart = touchStart; // Tap (Косание)*/
   if (isTouch) {
     space.player.lazers.push(new Lazer(space.player));
     space.player.lazerLoaded = false;
   }
   /************************************* */
-
-  if ((gameLoop.backgroundHeight > HEIGHT) && (gameLoop.backgroundHeight % gameLoop.bgIm.height) === 0) // % чтобы не дергался
-    gameLoop.backgroundHeight = 0;
-  else
-    gameLoop.backgroundHeight += 2;
-  gameLoop.drawBackground(ctx, gameLoop.backgroundHeight);
 
 
   switch (gameLoop.gameStatus) {
@@ -479,7 +510,6 @@ function reDraw() { //! TODO ???
       break;
     case 'play':
       gameLoop.gamePlay(ctx, WIDTH, HEIGHT, space);
-      //console.log('gameLoop.gameStatus = ', gameLoop.gameStatus)
       break;
     case 'finish':
       gameLoop.showText(ctx);
@@ -497,8 +527,8 @@ document.addEventListener("keydown", KeyDown, true);
 document.addEventListener("keyup", KeyUp, true);
 
 
-function KeyDown() { }
-function KeyUp() { }
+//function KeyDown() { }
+//function KeyUp() { }
 function touchStart() { }
 
 
@@ -541,10 +571,10 @@ function pressingButton() {
       break;
     case 'play':
       if (keys[0] == true && keys[1] == false && space.player.x <= WIDTH - space.player.w) {
-        space.player.x += space.player.vx;
+        space.player.x += space.player.speed;
       }
       if (keys[1] == true && keys[0] == false && space.player.x > 0) {
-        space.player.x -= space.player.vx;
+        space.player.x -= space.player.speed;
       }
       if (keys[2] == true) {
         if (space.player.lazerLoaded) {
@@ -562,7 +592,7 @@ function pressingButton() {
 }
 
 
-/*
+
 function KeyDown(e) {
   console.log('KeyDown')
   if (e.keyCode == 39) {
@@ -573,9 +603,9 @@ function KeyDown(e) {
   }
   pressingButton();
 }
-*/
 
-/*
+
+
 function KeyUp(e) {
   console.log('KeyUp')
   if (e.keyCode == 39) { // Right
@@ -590,7 +620,7 @@ function KeyUp(e) {
     keys[2] = false;
   }
 }
-*/
+
 
 /*
 canvas.addEventListener(
