@@ -16,6 +16,12 @@ class Player {
     this.shipExpIm = new Image();
     this.healthIm = new Image();
 
+    this.shipExpIm_sprite = new Image();
+    this.explLife = 14; // для отрисовки спрайта из 14ти картинок
+    this.currentExplLife = 14;
+    this.explWidth = 112;
+    this.explX;
+
     this.lazerReloadDistance = this.y - 120; // расстояние между снарядами
     this.lazerLoaded = true; // перезарядка оружия
     this.lazers = []; // магазин пушки
@@ -27,6 +33,8 @@ class Player {
     this.playerIm.src = 'assets\\images\\ship1.webp';
     this.shipExpIm.src = 'assets\\images\\explShip.webp';
     this.healthIm.src = 'assets\\images\\life.webp';
+
+    this.shipExpIm_sprite.src = 'assets\\images\\spriteMap_2.webp';
   }
 
   resize(WIDTH, HEIGHT) {
@@ -37,7 +45,17 @@ class Player {
   }
 
   drawSprite(ctx) {
-    ctx.drawImage(this.playerIm, this.x, this.y, this.w, this.h);
+    if(this.health > 0){
+      ctx.drawImage(this.playerIm, this.x, this.y, this.w, this.h);
+    }
+    else{
+      let life = this.explLife - this.currentExplLife; // 14 - 13
+    
+      //ctx.drawImage(this.shipExpIm_sprite, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
+      ctx.drawImage(this.shipExpIm_sprite, this.explWidth * life, 0, this.explWidth, this.shipExpIm_sprite.height, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
+      
+      this.currentExplLife--;
+    }
   }
 
   /*resetExplMusic() {
@@ -45,10 +63,30 @@ class Player {
     this.explMusic.currentTime = 0.0;
   }*/
 
-  drawExpSprite() {
+  drawExpSprite(ctx) {
     //this.resetExplMusic();
-    ctx.drawImage(this.shipExpIm, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
+
+    //ctx.drawImage(this.shipExpIm, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
+
+    //ctx.drawImage(this.shipExpIm_2, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);   
     /*this.explMusic.play();*/
+
+    /*ctx.drawImage(explIm, this.explX, 0, this.explWidth, explIm.height, this.x, this.y, this.w, this.h);
+    this.explX += this.explWidth;*/
+
+    let life = this.explLife - this.currentExplLife; // 14 - 13
+    
+    //ctx.drawImage(this.shipExpIm_sprite, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
+    ctx.drawImage(this.shipExpIm_sprite, this.explWidth * life, 0, this.explWidth, this.shipExpIm_sprite.height, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
+
+    //this.explX += this.explWidth;
+    this.currentExplLife--;
+    
+
+    //ctx.drawImage(this.shipExpIm_sprite, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
+    
+    
+    
   }
 
   drawScore(ctx) {
@@ -62,12 +100,10 @@ class Player {
   }
 
   drawHealth(ctx) {
-    if (this.health >= 3)
-      ctx.drawImage(this.healthIm, 10 + this.healthW + 10 + this.healthW + 10, 10, this.healthW, 40);
-    if (this.health >= 2)
-      ctx.drawImage(this.healthIm, 10 + this.healthW + 10, 10, this.healthW, 40);
-    if (this.health >= 1)
-      ctx.drawImage(this.healthIm, 10, 10, this.healthW, 40);
+    const ww = 10 + this.healthW;
+    for (let i = 0; i < this.health; i++) {
+      ctx.drawImage(this.healthIm, 10 + ww * i, 10, this.healthW, 40);
+    }
   }
 
   drawLasers(ctx) {
@@ -128,10 +164,10 @@ class Asteroid {
   drawSprite(ctx, asteroidIm) {
     //console.log('drawSprite', this);
     ctx.drawImage(asteroidIm, this.x, this.y, this.w, this.h);
-    
+
   }
 
-  move(){
+  move() {
     this.y += this.speed;
   }
 
@@ -139,7 +175,7 @@ class Asteroid {
   drawExplosion(ctx, explIm) {
     ctx.drawImage(explIm, this.explX, 0, this.explWidth, explIm.height, this.x, this.y, this.w, this.h);
     this.explX += this.explWidth;
-    this.explHeight += this.explWidth;
+    //this.explHeight += this.explWidth;
   }
 
   resize(WIDTH, HEIGHT) {
@@ -219,7 +255,7 @@ class Space {
 
   }
 
-  checkCollision(WIDTH, HEIGHT) {
+  checkCollision(ctx, WIDTH, HEIGHT) {
     for (let i = 0; i < this.asteroids.length; i++) {
       let currentA = this.asteroids[i];
 
@@ -230,7 +266,17 @@ class Space {
         (this.collidedAIndex !== this.asteroids.indexOf(currentA))) { // TODO this.asteroids.indexOf(currentA) это же по сути поиск i-го астероида
         this.collidedAIndex = this.asteroids.indexOf(currentA);
         this.player.health--;
-        this.player.drawExpSprite();
+
+        /*for (let i = 0; i < this.player.explLife; i++) {
+          this.player.drawExpSprite(ctx);
+          this.player.currentExplLife--;          
+        }*/
+        /*if (this.player.currentExplLife > 0) {
+          this.player.drawExpSprite(ctx);
+          this.player.currentExplLife--;
+        }*/
+
+        //this.player.drawExpSprite(ctx);
       }
 
       // Сброс индекса столкновения астероида с игроком
@@ -326,7 +372,7 @@ class GameLoop {
       bgH = 0;
       while (bgW < WIDTH) {
         while (bgH < HEIGHT) {
-          
+
           ctx.drawImage(this.bgIm, bgW, bgH);
           bgH += this.bgIm.height;
         }
@@ -336,12 +382,12 @@ class GameLoop {
     }
   }
 
-  gamePlay(ctx, WIDTH, HEIGHT, space) { //!!! TODO мб тут лучше сделать колбек
+  gamePlay(ctx, WIDTH, HEIGHT, space) {
     //console.log('gamePlay')
-    space.checkCollision(WIDTH, HEIGHT);
+    space.checkCollision(ctx, WIDTH, HEIGHT);
     space.drawAsteroids(ctx);
     space.player.drawLasers(ctx);
-    space.player.drawSprite(ctx);
+    space.player.drawSprite(ctx); // TODO тут надо как-то организовать взрыв на переднем плане
     space.player.drawScore(ctx);
     space.player.drawHealth(ctx);
     if (space.player.health <= 0) {
@@ -349,7 +395,7 @@ class GameLoop {
     }
   }
 
-  
+
 
   /* resize(ctx, WIDTH, HEIGHT){
     showText(ctx);
@@ -399,7 +445,7 @@ function reDraw() { //! TODO ???
   canvas.onmousedown = onMouseDown;
 
   canvas.touchstart = touchStart; // Tap (Косание)
-  if (isTouch) { 
+  if (isTouch) {
     space.player.lazers.push(new Lazer(space.player));
     space.player.lazerLoaded = false;
   }
@@ -423,8 +469,8 @@ function reDraw() { //! TODO ???
     case 'finish':
       gameLoop.showText(ctx);
       break;
-  }  
-  
+  }
+
   //console.log('gameLoop.gameStatus = ', gameLoop.gameStatus)
   //setTimeout(window.requestAnimationFrame(reDraw()), 1500);
   window.requestAnimationFrame(reDraw); //! TODO ??? 
@@ -436,14 +482,14 @@ document.addEventListener("keydown", KeyDown, true);
 document.addEventListener("keyup", KeyUp, true);
 
 
-function KeyDown() {}
-function KeyUp() {}
-function touchStart() {}
+function KeyDown() { }
+function KeyUp() { }
+function touchStart() { }
 
 
 function onMouseDown() {
-  console.log('onMouseDown')  
-  
+  console.log('onMouseDown')
+
   switch (gameLoop.gameStatus) {
     case 'start':
       gameLoop.gameStatus = 'play';
@@ -456,12 +502,12 @@ function onMouseDown() {
         space.player.lazerLoaded = false;
       }
       break;
-    case 'finish': 
+    case 'finish':
       gameLoop.gameStatus = 'start';
       space.player.lazers = [];
       space.asteroids = [];
       break;
-  }  
+  }
 }
 
 
@@ -487,7 +533,7 @@ function pressingButton() {
       }
       if (keys[2] == true) {
         if (space.player.lazerLoaded) {
-          space.player.lazers.push(new Lazer(space.player)); 
+          space.player.lazers.push(new Lazer(space.player));
           space.player.lazerLoaded == false;
         }
       }
@@ -540,12 +586,12 @@ canvas.addEventListener(
     e.preventDefault(); // Предотвращение скролла ???
     //e.stopPropagation(); //останавливает "всплытие" вызова события к родительским элементам
     /* далее код обработки события*/
-    /*if (e.targetTouches.length === 1) {
-      let touch = e.targetTouches[0];
-      isTouch === true;
-      space.player.x = touch.pageX - space.player.w / 2;
-    }
-  }
+/*if (e.targetTouches.length === 1) {
+  let touch = e.targetTouches[0];
+  isTouch === true;
+  space.player.x = touch.pageX - space.player.w / 2;
+}
+}
 );
 */
 

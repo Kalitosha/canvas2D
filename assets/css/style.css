@@ -9,7 +9,7 @@
 
 .canvas{
     background-color: #1A103D;
-    background-image: url('../images/background.png');
+    background-image: url('../images/background.webp');
 	margin:0.1px;
 	padding:0;
     touch-action: manipulation; /*отключение двойного клика - увеличения на сенсорных устройствах*/
