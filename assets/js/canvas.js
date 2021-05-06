@@ -13,7 +13,7 @@ class Player {
     this.health = 3; // количество жизней
     this.healthW = 50; // ширина сердечка
 
-    //this.explMusic = new Audio('assets\\audio\\explosion1.mp3');
+    this.explMusic = new Audio('assets\\audio\\explosion1.mp3');
     this.playerIm = new Image();
     this.shipExpIm = new Image();
     this.healthIm = new Image();
@@ -76,16 +76,6 @@ class Player {
         this.currentExplLife = this.explLife;
       }
     }
-  }
-
-  /*resetExplMusic() {
-    this.explMusic.pause(); // !!! TODO https://developers.google.com/web/updates/2017/06/play-request-was-interrupted
-    this.explMusic.currentTime = 0.0;
-  }*/
-
-  drawExpSprite(ctx) {
-    //this.resetExplMusic();
-    //ctx.drawImage(this.shipExpIm, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
   }
 
   drawScore(ctx) {
@@ -191,8 +181,8 @@ class Space {
     this.collidedAIndex = -1; // индекс столкновений
 
     this.player = new Player(WIDTH, HEIGHT);
-    //this.explMusic = new Audio('assets\\audio\\explosion2.mp3');
-    
+    this.explMusic = new Audio('assets\\audio\\explosion2.mp3');
+
     this.init();
   }
 
@@ -257,17 +247,19 @@ class Space {
         if ((currentA.x - currentA.w / 4 * 3 <= this.player.x) &&
           (currentA.x + currentA.w / 4 * 3 >= this.player.x) &&
           (currentA.y + currentA.h / 3 >= this.player.y) &&
-          (this.collidedAIndex !== this.asteroids.indexOf(currentA))) { // TODO this.asteroids.indexOf(currentA) это же по сути поиск i-го астероида
+          (this.collidedAIndex !== this.asteroids.indexOf(currentA))) {
           this.collidedAIndex = this.asteroids.indexOf(currentA);
           this.player.health--;
           this.player.currentExplLife--;
         }
 
         // Сброс индекса столкновения астероида с игроком
-        if (this.collidedAIndex === this.asteroids.indexOf(currentA) && // TODO this.asteroids.indexOf(currentA) это же по сути поиск i-го астероида
+        if (this.collidedAIndex === this.asteroids.indexOf(currentA) && 
           currentA.y < HEIGHT / 2) {
           this.collidedAIndex = -1;
         }
+      } else {
+        this.player.explMusic.play();
       }
 
       // столкновение лазера с астероидами
@@ -278,9 +270,8 @@ class Space {
           (currentL.y <= currentA.y)) {
           currentA.alive = false;
 
-          /*this.explMusic.pause();
-          this.explMusic.currentTime = 0.0;
-          this.explMusic.play();*/
+          this.explMusic.stop();
+          this.explMusic.play();
 
           this.player.score++;
           this.player.lazers.splice(this.player.lazers.indexOf(currentL), 1);
@@ -381,7 +372,7 @@ class GameLoop {
     space.checkCollision(ctx);
     space.drawAsteroids(ctx);
     space.player.drawLasers(ctx);
-    space.player.drawSprite(ctx); // TODO тут надо как-то организовать взрыв на переднем плане
+    space.player.drawSprite(ctx);
     space.player.drawScore(ctx);
     space.player.drawHealth(ctx);
     if ((space.player.health <= 0) && (space.player.explLife === space.player.currentExplLife)) {
@@ -399,6 +390,14 @@ let HEIGHT = window.innerHeight;
 
 const space = new Space(WIDTH, HEIGHT);
 const gameLoop = new GameLoop(WIDTH, HEIGHT)
+
+// Функция stop для Audio:
+HTMLAudioElement.prototype.stop = function () {
+  this.pause();
+  this.currentTime = 0.0;
+}
+
+
 
 window.onload = () => {
   canvas.width = window.innerWidth;
