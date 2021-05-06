@@ -1,11 +1,11 @@
 class Player {
   constructor(WIDTH, HEIGHT) {
     this.reductionRatio = NaN; // коэффициент уменьшения
-    (WIDTH < HEIGHT)? this.reductionRatio = WIDTH : this.reductionRatio = HEIGHT;
+    (WIDTH < HEIGHT) ? this.reductionRatio = WIDTH : this.reductionRatio = HEIGHT;
     this.w = this.reductionRatio / 10; // ширина
     this.h = this.reductionRatio / 9; // высота
     this.x = WIDTH / 2 - HEIGHT / 10 / 2; // координата х
-    this.y = HEIGHT - this.h * 4/3; // координата у
+    this.y = HEIGHT - this.h * 4 / 3; // координата у
 
     this.speed = 8; // скорость перемещения
     this.score = 0; // счет 
@@ -39,12 +39,12 @@ class Player {
     this.shipExpIm_sprite.src = 'assets\\images\\spriteMap_2.webp';
   }
 
-  resize(WIDTH, HEIGHT) {
-    (WIDTH < HEIGHT)? this.reductionRatio = WIDTH : this.reductionRatio = HEIGHT;
+  resize() {
+    (WIDTH < HEIGHT) ? this.reductionRatio = WIDTH : this.reductionRatio = HEIGHT;
     this.w = this.reductionRatio / 10; // ширина
     this.h = this.reductionRatio / 9; // высота
     this.x = WIDTH / 2 - HEIGHT / 5; // координата х
-    this.y = HEIGHT - this.h * 4/3; // координата у
+    this.y = HEIGHT - this.h * 4 / 3; // координата у
   }
 
   reset() {
@@ -69,7 +69,7 @@ class Player {
       if (life <= 4) {
         ctx.drawImage(this.shipExpIm, this.x, this.y, this.w, this.h);
       }
-      ctx.drawImage(this.shipExpIm_sprite, this.explWidth * life, 0, this.explWidth, this.shipExpIm_sprite.height, this.x - this.w / 2, this.y - this.h * 4/3, this.w * 2, this.h * 2);
+      ctx.drawImage(this.shipExpIm_sprite, this.explWidth * life, 0, this.explWidth, this.shipExpIm_sprite.height, this.x - this.w / 2, this.y - this.h * 4 / 3, this.w * 2, this.h * 2);
 
       this.currentExplLife--;
       if (this.currentExplLife === 0) {
@@ -142,10 +142,11 @@ class Lazer {
   }
 }
 
+
 class Asteroid {
   constructor() {
     this.reductionRatio = 0;
-    (WIDTH < HEIGHT)? this.reductionRatio = WIDTH : this.reductionRatio = HEIGHT// коэффициент уменьшения
+    (WIDTH < HEIGHT) ? this.reductionRatio = WIDTH : this.reductionRatio = HEIGHT// коэффициент уменьшения
     this.alive = true;
     this.speed = Math.random() * (8 - 3) + 3; // скорость = [3;8) 
     this.x = Math.floor(Math.random() * WIDTH - HEIGHT / 10);
@@ -155,8 +156,6 @@ class Asteroid {
     this.explLife = 6; // для отрисовки спрайта из 6ти картинок
     this.explX = 0;
     this.explWidth = 194; // ширина спрайта
-
-
   }
 
   drawSprite(ctx, asteroidIm) {
@@ -173,15 +172,14 @@ class Asteroid {
     this.explX += this.explWidth;
   }
 
-  resize(WIDTH, HEIGHT) {
-    (WIDTH < HEIGHT)? this.reductionRatio = WIDTH : this.reductionRatio = HEIGHT;
+  resize() {
+    (WIDTH < HEIGHT) ? this.reductionRatio = WIDTH : this.reductionRatio = HEIGHT;
     this.h = this.reductionRatio / 10;
     this.w = this.reductionRatio / 10;
   }
 }
 
 
-//надкласс для астероидов
 class Space {
   constructor(WIDTH, HEIGHT) {
     this.asteroids = []; // живые астероиды
@@ -194,7 +192,7 @@ class Space {
 
     this.player = new Player(WIDTH, HEIGHT);
     //this.explMusic = new Audio('assets\\audio\\explosion2.mp3');
-
+    
     this.init();
   }
 
@@ -209,7 +207,6 @@ class Space {
   }
 
   drawAsteroids(ctx) {
-    //console.log('drawAsteroids')
     if (
       Math.random() <= 0.099 &&  // создаем новые астероиды
       this.asteroids.length < this.maxAsteroids) {
@@ -244,15 +241,14 @@ class Space {
     }
   }
 
-  resize(WIDTH, HEIGHT) { //TODO !!!
-    this.player.resize(WIDTH, HEIGHT)
+  resize() {
+    this.player.resize()
     for (let value of this.asteroids) {
-      value.resize(WIDTH, HEIGHT);
+      value.resize();
     }
-
   }
 
-  checkCollision(ctx, WIDTH, HEIGHT) {
+  checkCollision(ctx) {
     for (let i = 0; i < this.asteroids.length; i++) {
       let currentA = this.asteroids[i];
 
@@ -265,18 +261,6 @@ class Space {
           this.collidedAIndex = this.asteroids.indexOf(currentA);
           this.player.health--;
           this.player.currentExplLife--;
-
-          /*for (let i = 0; i < this.player.explLife; i++) {
-            this.player.drawExpSprite(ctx);
-            this.player.currentExplLife--;          
-          }*/
-          /*if (this.player.currentExplLife > 0) {
-            this.player.drawExpSprite(ctx);
-            this.player.currentExplLife--;
-          }*/
-
-          //this.player.drawExpSprite(ctx);
-          //this.player.drawSprite(ctx);
         }
 
         // Сброс индекса столкновения астероида с игроком
@@ -303,9 +287,9 @@ class Space {
         }
       }
     }
-
   }
 }
+
 
 class GameLoop {
   constructor(WIDTH, HEIGHT) {
@@ -318,10 +302,13 @@ class GameLoop {
   }
 
   init() {
-    this.bgIm.src = 'assets\\images\\space.webp'; 
+    this.bgIm.src = 'assets\\images\\space.webp';
   }
 
   showText(ctx) {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
     ctx.fillStyle = "#cb6e06";
@@ -384,17 +371,14 @@ class GameLoop {
     }
   }
 
-  gamePlay(ctx, WIDTH, HEIGHT, space) {
-    //console.log('gamePlay')
-
+  gamePlay(ctx, space) {
     if ((this.backgroundHeight > HEIGHT) && (this.backgroundHeight % this.bgIm.height) === 0) // % чтобы не дергался
       this.backgroundHeight = 0;
     else
       this.backgroundHeight += 2;
 
     this.drawBackground(ctx, this.backgroundHeight);
-
-    space.checkCollision(ctx, WIDTH, HEIGHT);
+    space.checkCollision(ctx);
     space.drawAsteroids(ctx);
     space.player.drawLasers(ctx);
     space.player.drawSprite(ctx); // TODO тут надо как-то организовать взрыв на переднем плане
@@ -406,141 +390,72 @@ class GameLoop {
   }
 }
 
-
-
-console.log('it`s work')
+/* ---------------------------------------------------------- */
 const canvas = document.querySelector(".canvas");
 const ctx = canvas.getContext("2d");
 
 let WIDTH = window.innerWidth;
 let HEIGHT = window.innerHeight;
 
+const space = new Space(WIDTH, HEIGHT);
+const gameLoop = new GameLoop(WIDTH, HEIGHT)
 
-let keys = [false, false, false];
-let isTouch = false;
-/* ---------------------------------------------------------- */
-
-space = new Space(WIDTH, HEIGHT);
-gameLoop = new GameLoop(WIDTH, HEIGHT)
-
-
-
-
-window.onload = function () {
+window.onload = () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-
-  console.log('onload')
-  //setTimeout(reDraw(), 2000);
   reDraw()
-
 }
 
-
-function reDraw() { //! TODO ??? 
-
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  /************************************* */
-  /*********можно убрать отсюда***********/
-  /*canvas.onmousemove = mouseMove;
-  canvas.onmousedown = onMouseDown;
-
-  canvas.touchstart = touchStart; // Tap (Косание)*/
-  if (isTouch) {
-    space.player.lazers.push(new Lazer(space.player));
-    space.player.lazerLoaded = false;
-  }
-  /************************************* */
-
-
+function reDraw() {
   switch (gameLoop.gameStatus) {
     case 'start':
       gameLoop.showText(ctx);
       space.reset();
       break;
     case 'play':
-      gameLoop.gamePlay(ctx, WIDTH, HEIGHT, space);
+      gameLoop.gamePlay(ctx, space);
       break;
     case 'finish':
       gameLoop.showText(ctx);
       break;
   }
-
-  //console.log('gameLoop.gameStatus = ', gameLoop.gameStatus)
-  //setTimeout(window.requestAnimationFrame(reDraw()), 1500);
-  window.requestAnimationFrame(reDraw); //! TODO ??? 
+  window.requestAnimationFrame(reDraw);
 }
 
 /*****************обработчики***********************/
 window.addEventListener('resize', resize);
 document.addEventListener('keydown', KeyDown, true);
 document.addEventListener('keyup', KeyUp, true);
-
-
-//canvas.onmousemove = mouseMove;
-//canvas.onmousedown = onMouseDown;
-
-canvas.addEventListener('mousemove', mouseMove);
-canvas.addEventListener('onmousedown', onMouseDown);
-
+canvas.onmousemove = mouseMove;
+canvas.onmousedown = onMouseDown;
+//canvas.touchstart = touchStart; // при таком объявлении кораблик прыгает
 canvas.addEventListener('touchstart', touchStart);
-//canvas.touchstart = touchStart; // Tap (Косание)
 canvas.addEventListener('touchmove', touchMove);
 
 
-
-
-//function KeyDown() { }
-//function KeyUp() { }
-//function touchStart() { }
-
-
 function onMouseDown(e) {
-  console.log('onMouseDown')
-
-  e.preventDefault();
-  e.stopPropagation();
-
-  switch (gameLoop.gameStatus) {
-    case 'start':
-      gameLoop.gameStatus = 'play';
-      break;
-    case 'play':
-      if (space.player.lazerLoaded) {
-        space.player.lazers.push(new Lazer(space.player));
-        space.player.lazerLoaded = false;
-      }
-      break;
-    case 'finish':
-      gameLoop.gameStatus = 'start';
-      break;
-  }
+  pressingButton('click');
 }
-
 
 function mouseMove(e) {
   space.player.x = e.clientX - space.player.w / 2;
 };
 
-
-function pressingButton() {
-  console.log('pressingButton: KeyDown/KeyUp')
-
+function pressingButton(flag) {
+  //console.log('pressingButton: KeyDown/KeyUp')
   switch (gameLoop.gameStatus) {
     case 'start':
       gameLoop.gameStatus = 'play';
       break;
     case 'play':
-      if (keys[0] == true && keys[1] == false && space.player.x <= WIDTH - space.player.w) {
+      if (flag === 'right' && space.player.x <= WIDTH - space.player.w) {
         space.player.x += space.player.speed;
       }
-      if (keys[1] == true && keys[0] == false && space.player.x > 0) {
+      else if (flag === 'left' && space.player.x > 0) {
         space.player.x -= space.player.speed;
       }
-      if (keys[2] == true) {
-        if (space.player.lazerLoaded) {
+      else { //пробел, клик или тач
+        if ((space.player.lazerLoaded) && (flag === 'click' || flag === 'space')) {
           space.player.lazers.push(new Lazer(space.player));
           space.player.lazerLoaded == false;
         }
@@ -552,90 +467,41 @@ function pressingButton() {
   }
 }
 
-
 function KeyDown(e) {
-  console.log('KeyDown')
-  if (e.keyCode == 39) {
-    keys[0] = true;
+  if (e.key === 'ArrowRight') {
+    pressingButton('right');
   }
-  else if (e.keyCode == 37) {
-    keys[1] = true;
+  else if (e.key === 'ArrowLeft') {
+    pressingButton('left');
   }
-  pressingButton();
 }
-
 
 function KeyUp(e) {
-  console.log('KeyUp')
-  if (e.keyCode == 39) { // Right
-    keys[0] = false;
-  }
-  else if (e.keyCode == 37) { // Left
-    keys[1] = false;
-  }
-  if (e.keyCode == 32) {// Space
-    keys[2] = true;
-    pressingButton();
-    keys[2] = false;
+  if (e.key === ' ') {
+    pressingButton('space');
   }
 }
 
-
 function touchMove(e) {
-  console.log('touchmove')
-  //e.stopImmediatePropagation()
   e.stopPropagation();
   e.preventDefault();
-  //e.stopPropagation(); //останавливает "всплытие" вызова события к родительским элементам
-  /* далее код обработки события*/
   if (e.targetTouches.length === 1) {
     let touch = e.targetTouches[0];
-    isTouch === true;
     space.player.x = touch.pageX - space.player.w / 2;
   }
 }
 
-
-
 function touchStart(e) {
-  console.log('touchStart')
-
-  //e.stopImmediatePropagation()
   e.stopPropagation();
   e.preventDefault();
-  //e.stopPropagation();
-
-  isTouch === true;
-  switch (gameLoop.gameStatus) {
-    case 'start':
-      gameLoop.gameStatus = 'play';
-      /*space.player.health = 3;
-      space.player.score = 0;*/
-      break;
-    case 'play':
-      if (space.player.lazerLoaded) {
-        space.player.lazers.push(new Lazer(space.player));
-        space.player.lazerLoaded = false;
-      }
-      break;
-    case 'finish':
-      gameLoop.gameStatus = 'start';
-      /*space.player.llazers = [];
-      space.asteroids = [];*/
-      break;
-  }
+  pressingButton('click');
 }
 
-
 function resize(e) {
-  console.log('resize')
-  //console.log(e.target)
-
   canvas.width = e.target.innerWidth;
   canvas.height = e.target.innerHeight;
-
   WIDTH = e.target.innerWidth;
   HEIGHT = e.target.innerHeight;
 
-  space.resize(WIDTH, HEIGHT);
+  space.resize();
 }
