@@ -17,10 +17,8 @@
     "webpack-dev-server": "^3.11.2"
   },
   "scripts": {
-    "serve": "webpack-dev-server --mode development",
     "nodemon": "nodemon --exec babel-node server.js",
-    "build": "webpack --mode production",
-    "test": "mocha --require @babel/register",
+    "build": "webpack --mode=production",
     "dev_serve": "webpack serve --mode=development"
   },
   "repository": {
