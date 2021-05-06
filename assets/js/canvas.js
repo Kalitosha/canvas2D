@@ -1,9 +1,11 @@
 class Player {
   constructor(WIDTH, HEIGHT) {
+    this.reductionRatio = NaN; // коэффициент уменьшения
+    (WIDTH < HEIGHT)? this.reductionRatio = WIDTH : this.reductionRatio = HEIGHT;
+    this.w = this.reductionRatio / 10; // ширина
+    this.h = this.reductionRatio / 9; // высота
     this.x = WIDTH / 2 - HEIGHT / 10 / 2; // координата х
-    this.y = HEIGHT - HEIGHT / 9 - 15; // координата у
-    this.w = HEIGHT / 10; // ширина
-    this.h = HEIGHT / 9; // высота
+    this.y = HEIGHT - this.h * 4/3; // координата у
 
     this.speed = 8; // скорость перемещения
     this.score = 0; // счет 
@@ -38,10 +40,11 @@ class Player {
   }
 
   resize(WIDTH, HEIGHT) {
-    this.x = WIDTH / 2 - HEIGHT / 10 / 2; // координата х
-    this.y = HEIGHT - HEIGHT / 9 - 15; // координата у
-    this.w = HEIGHT / 10; // ширина
-    this.h = HEIGHT / 9; // высота
+    (WIDTH < HEIGHT)? this.reductionRatio = WIDTH : this.reductionRatio = HEIGHT;
+    this.w = this.reductionRatio / 10; // ширина
+    this.h = this.reductionRatio / 9; // высота
+    this.x = WIDTH / 2 - HEIGHT / 5; // координата х
+    this.y = HEIGHT - this.h * 4/3; // координата у
   }
 
   reset() {
@@ -66,13 +69,9 @@ class Player {
       if (life <= 4) {
         ctx.drawImage(this.shipExpIm, this.x, this.y, this.w, this.h);
       }
-
-      //ctx.drawImage(this.shipExpIm_sprite, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
-      ctx.drawImage(this.shipExpIm_sprite, this.explWidth * life, 0, this.explWidth, this.shipExpIm_sprite.height, this.x - this.w / 2, this.y - this.h * 3 / 2, this.w * 2, this.h * 2);
+      ctx.drawImage(this.shipExpIm_sprite, this.explWidth * life, 0, this.explWidth, this.shipExpIm_sprite.height, this.x - this.w / 2, this.y - this.h * 4/3, this.w * 2, this.h * 2);
 
       this.currentExplLife--;
-      //console.log('currentExplLife ', this.currentExplLife)
-
       if (this.currentExplLife === 0) {
         this.currentExplLife = this.explLife;
       }
@@ -129,11 +128,9 @@ class Player {
 
 class Lazer {
   constructor(player) {
-
     this.x = player.x + player.w / 2;
     this.y = player.y;
     this.lazerSpeed = 16;
-
   }
 
   drawOneLazer(ctx) {
@@ -143,28 +140,27 @@ class Lazer {
     ctx.fillRect(this.x, this.y, 2, 18);
     ctx.shadowBlur = 0;
   }
-
 }
 
 class Asteroid {
   constructor() {
+    this.reductionRatio = 0;
+    (WIDTH < HEIGHT)? this.reductionRatio = WIDTH : this.reductionRatio = HEIGHT// коэффициент уменьшения
     this.alive = true;
-    this.speed = Math.random() * (8 - 3) + 3; // [3;8) //TODO возможно надо сделать их реже
+    this.speed = Math.random() * (8 - 3) + 3; // скорость = [3;8) 
     this.x = Math.floor(Math.random() * WIDTH - HEIGHT / 10);
     this.y = 0 - HEIGHT / 10;
-    this.h = HEIGHT / 10;
-    this.w = HEIGHT / 10;
-
+    this.h = this.reductionRatio / 10;
+    this.w = this.reductionRatio / 10;
     this.explLife = 6; // для отрисовки спрайта из 6ти картинок
-
     this.explX = 0;
     this.explWidth = 194; // ширина спрайта
+
+
   }
 
   drawSprite(ctx, asteroidIm) {
-    //console.log('drawSprite', this);
     ctx.drawImage(asteroidIm, this.x, this.y, this.w, this.h);
-
   }
 
   move() {
@@ -175,14 +171,12 @@ class Asteroid {
   drawExplosion(ctx, explIm) {
     ctx.drawImage(explIm, this.explX, 0, this.explWidth, explIm.height, this.x, this.y, this.w, this.h);
     this.explX += this.explWidth;
-    //this.explHeight += this.explWidth;
   }
 
   resize(WIDTH, HEIGHT) {
-    this.x = WIDTH / 2 - HEIGHT / 10 / 2; // координата х
-    this.y = 0 - HEIGHT / 10;
-    this.h = HEIGHT / 10;
-    this.w = HEIGHT / 10;
+    (WIDTH < HEIGHT)? this.reductionRatio = WIDTH : this.reductionRatio = HEIGHT;
+    this.h = this.reductionRatio / 10;
+    this.w = this.reductionRatio / 10;
   }
 }
 
@@ -252,10 +246,8 @@ class Space {
 
   resize(WIDTH, HEIGHT) { //TODO !!!
     this.player.resize(WIDTH, HEIGHT)
-    //this.asteroids.forEach(el => {
     for (let value of this.asteroids) {
       value.resize(WIDTH, HEIGHT);
-      //console.log(value);
     }
 
   }
@@ -326,7 +318,7 @@ class GameLoop {
   }
 
   init() {
-    this.bgIm.src = 'assets\\images\\space.webp'; //'assets\\images\\background.webp'; 
+    this.bgIm.src = 'assets\\images\\space.webp'; 
   }
 
   showText(ctx) {
@@ -412,12 +404,6 @@ class GameLoop {
       this.gameStatus = 'finish';
     }
   }
-
-  /* resize(ctx, WIDTH, HEIGHT){
-    showText(ctx);
-
-  }*/
-
 }
 
 
@@ -441,8 +427,8 @@ gameLoop = new GameLoop(WIDTH, HEIGHT)
 
 
 window.onload = function () {
-  canvas.width = WIDTH;
-  canvas.height = HEIGHT;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
   console.log('onload')
   //setTimeout(reDraw(), 2000);
@@ -533,10 +519,6 @@ function onMouseDown(e) {
   }
 }
 
-/*
-const mouseMove = function (e) {
-  space.player.x = e.clientX - space.player.w / 2;
-};*/
 
 function mouseMove(e) {
   space.player.x = e.clientX - space.player.w / 2;
@@ -601,7 +583,8 @@ function KeyUp(e) {
 
 function touchMove(e) {
   console.log('touchmove')
-  e.stopImmediatePropagation()
+  //e.stopImmediatePropagation()
+  e.stopPropagation();
   e.preventDefault();
   //e.stopPropagation(); //останавливает "всплытие" вызова события к родительским элементам
   /* далее код обработки события*/
@@ -617,7 +600,8 @@ function touchMove(e) {
 function touchStart(e) {
   console.log('touchStart')
 
-  e.stopImmediatePropagation()
+  //e.stopImmediatePropagation()
+  e.stopPropagation();
   e.preventDefault();
   //e.stopPropagation();
 
@@ -653,5 +637,5 @@ function resize(e) {
   WIDTH = e.target.innerWidth;
   HEIGHT = e.target.innerHeight;
 
-  //space.resize(WIDTH, HEIGHT);
+  space.resize(WIDTH, HEIGHT);
 }
