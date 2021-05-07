@@ -1,6 +1,5 @@
 ﻿body {
     padding: 0px;
-    background-position: left top;
     margin: 0;
     display: flex;
     justify-content: center;
@@ -8,11 +7,7 @@
 }
 
 .canvas{
-    background-color: #1A103D;
-    background-image: url('../images/space.webp');
+    background-color: #1A103D; /* на всякий случай */
 	margin:0.1px;
 	padding:0;
-    touch-action: manipulation; /*отключение двойного клика - увеличения на сенсорных устройствах*/
-    /* width: 100vw;
-    height: 100vh; */
 }

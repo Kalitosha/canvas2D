@@ -1,5 +1,7 @@
 class Player {
   constructor(WIDTH, HEIGHT) {
+    WIDTH = window.innerWidth;
+    HEIGHT = window.innerHeight;
     this.reductionRatio = NaN; // коэффициент уменьшения
     (WIDTH < HEIGHT) ? this.reductionRatio = WIDTH : this.reductionRatio = HEIGHT;
     this.w = this.reductionRatio / 10; // ширина
@@ -254,7 +256,7 @@ class Space {
         }
 
         // Сброс индекса столкновения астероида с игроком
-        if (this.collidedAIndex === this.asteroids.indexOf(currentA) && 
+        if (this.collidedAIndex === this.asteroids.indexOf(currentA) &&
           currentA.y < HEIGHT / 2) {
           this.collidedAIndex = -1;
         }
@@ -288,6 +290,7 @@ class GameLoop {
     this.bgIm = new Image();
     this.gameStatus = 'start'; // start, play, finish
     this.backgroundHeight = 0;
+    this.bgSpeed = 2;
 
     this.init();
   }
@@ -311,64 +314,53 @@ class GameLoop {
       this.playText = 'Click to start';
     }
     else if (this.gameStatus === 'finish') {
-      ctx.font = '100px Comic Sans MS';
-      ctx.fillText('your score: ' + space.player.score, WIDTH / 2 - ctx.measureText(this.playText).width / 2, HEIGHT / 2 + 150);
+      ctx.font = '90px Comic Sans MS';
+      ctx.fillText('your score: ' + space.player.score, WIDTH / 2 - ctx.measureText(this.playText).width / 2, HEIGHT / 2 + 120);
 
       this.playText = 'GAME OVER';
     }
 
-    ctx.font = 'bold 150px Comic Sans MS';
+    ctx.font = 'bold 120px Comic Sans MS';
     ctx.fillText(this.playText, WIDTH / 2 - ctx.measureText(this.playText).width / 2, HEIGHT / 2);
     ctx.shadowBlur = 0;
   }
 
-  drawBackground(ctx, heightBg) { //TODO надо оптимизировать (3 раза почти один и тот же код)
-    let bgW = 0;
-    let bgH = heightBg - HEIGHT - this.bgIm.height / 3.2;
-    if (this.gameStatus === 'play') {
-      while (bgW < WIDTH) {
-        while (bgH < heightBg) {
-          ctx.drawImage(this.bgIm, bgW, bgH);
-          bgH += this.bgIm.height;
-        }
-        bgW += this.bgIm.width;
-        bgH = heightBg - HEIGHT - this.bgIm.height / 3.2;
-      }
-
-      bgW = 0;
-      bgH = heightBg;
-
-      while (bgW < WIDTH) {
-        while (bgH < HEIGHT) {
-          ctx.drawImage(this.bgIm, bgW, bgH);
-          bgH += this.bgIm.height;
-        }
-        bgW += this.bgIm.width;
-        bgH = heightBg;
-      }
+  drawBackground(ctx) { //TODO иногда текструра не состыкуется (возможно надо поискать другую картинку или еще подумать над алгоритмом)
+        if (this.backgroundHeight + this.bgSpeed < HEIGHT) {
+      this.backgroundHeight += this.bgSpeed;
     }
     else {
-      bgW = 0;
-      bgH = 0;
-      while (bgW < WIDTH) {
-        while (bgH < HEIGHT) {
-
-          ctx.drawImage(this.bgIm, bgW, bgH);
-          bgH += this.bgIm.height;
-        }
-        bgW += this.bgIm.width;
-        bgH = 0;
-      }
+      this.backgroundHeight = 0;
     }
+    
+    let bgW = 0;
+    let bgH = this.backgroundHeight;
+
+    while (bgW < WIDTH) { // возврат фона наверх
+      while (bgH < HEIGHT) {
+        ctx.drawImage(this.bgIm, bgW, bgH);
+        bgH += this.bgIm.height;
+      }
+      bgW += this.bgIm.width;
+      bgH = this.backgroundHeight;
+    }
+
+    bgW = 0;
+    bgH = this.backgroundHeight  - HEIGHT - this.bgIm.height;
+
+    while (bgW < WIDTH) { //движемся по горизонтали
+      while (bgH < this.backgroundHeight) { // движемся по вертикали
+        ctx.drawImage(this.bgIm, bgW, bgH);
+        bgH += this.bgIm.height;
+      }
+      bgW += this.bgIm.width;
+      bgH = this.backgroundHeight - HEIGHT - this.bgIm.height;
+    }
+
   }
 
   gamePlay(ctx, space) {
-    if ((this.backgroundHeight > HEIGHT) && (this.backgroundHeight % this.bgIm.height) === 0) // % чтобы не дергался
-      this.backgroundHeight = 0;
-    else
-      this.backgroundHeight += 2;
-
-    this.drawBackground(ctx, this.backgroundHeight);
+    this.drawBackground(ctx);
     space.checkCollision(ctx);
     space.drawAsteroids(ctx);
     space.player.drawLasers(ctx);
@@ -383,6 +375,8 @@ class GameLoop {
 
 /* ---------------------------------------------------------- */
 const canvas = document.querySelector(".canvas");
+canvas.style.touchAction = 'manipulation'; /*отключение двойного клика (увеличения) на сенсорных устройствах*/
+canvas.style.backgroundImage = "url('assets/images/space.webp')";
 const ctx = canvas.getContext("2d");
 
 let WIDTH = window.innerWidth;
@@ -410,6 +404,7 @@ function reDraw() {
     case 'start':
       gameLoop.showText(ctx);
       space.reset();
+      space.resize();
       break;
     case 'play':
       gameLoop.gamePlay(ctx, space);
@@ -441,7 +436,6 @@ function mouseMove(e) {
 };
 
 function pressingButton(flag) {
-  //console.log('pressingButton: KeyDown/KeyUp')
   switch (gameLoop.gameStatus) {
     case 'start':
       gameLoop.gameStatus = 'play';
