@@ -18,8 +18,9 @@
   },
   "scripts": {
     "nodemon": "nodemon --exec babel-node server.js",
-    "build": "webpack --mode=production",
-    "dev_serve": "webpack serve --mode=development"
+    "build": "webpack",
+    "dev_serve": "webpack serve --mode=development",
+    "start": "webpack --watch"
   },
   "repository": {
     "type": "git",
